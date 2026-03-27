@@ -81,25 +81,34 @@
             color: var(--text-main);
             display: flex;
             justify-content: center;
-            padding: 20px 15px 100px 15px;
+            padding: 20px 15px 40px 15px; /* Sem espaço extra de FAB */
             transition: background-color 0.3s, color 0.3s;
         }
 
         .container { width: 100%; max-width: 500px; }
 
-        /* Cabeçalho */
+        /* NOVO CABEÇALHO (2 BOTÕES OPOSTOS) */
         header { margin-bottom: 25px; margin-top: 5px; }
 
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .header-top h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
-        .header-actions { display: flex; gap: 8px; }
-
+        
+        .header-top h1 { 
+            font-size: 1.4rem; font-weight: 700; color: var(--text-main); 
+            letter-spacing: -0.5px; margin: 0; text-align: center; flex: 1; 
+        }
+        
         .btn-icon {
             background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-muted);
-            width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; box-shadow: var(--shadow-sm); transition: all 0.2s;
+            width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: var(--shadow-sm); transition: all 0.2s; flex-shrink: 0;
         }
         .btn-icon:hover { color: var(--primary); border-color: var(--primary); }
+
+        .btn-icon.primary-icon {
+            background: var(--primary); color: white; border: none;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+        }
+        .btn-icon.primary-icon:hover { background: var(--primary-hover); transform: scale(1.05); color: white; }
 
         .month-selector {
             display: flex; align-items: center; justify-content: center;
@@ -234,20 +243,6 @@
             display: flex; align-items: center; gap: 8px; white-space: nowrap;
         }
         #notificacao.show { top: 20px; }
-
-        /* FAB */
-        .fab {
-            position: fixed; bottom: 30px; right: 50%; transform: translateX(50%); width: 64px; height: 64px;
-            border-radius: 32px; background-color: var(--primary); color: white; display: flex; justify-content: center;
-            align-items: center; box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4); border: none; cursor: pointer;
-            z-index: 100; transition: transform 0.2s, background-color 0.3s;
-        }
-        @media (min-width: 500px) {
-            .fab { right: max(30px, calc(50% - 250px)); transform: none; }
-            .fab:hover { transform: scale(1.05); }
-        }
-        .fab:hover { background-color: var(--primary-hover); transform: scale(1.05) translateX(50%); }
-        @media (min-width: 500px) { .fab:hover { transform: scale(1.05); } }
 
         /* Modais Base */
         .modal-backdrop {
@@ -412,21 +407,22 @@
 </head>
 <body data-theme="claro">
     <div class="container">
+        <!-- NOVO CABEÇALHO: Dois botões em lados opostos -->
         <header>
             <div class="header-top">
+                <!-- Botão de Configurações Gerais (Esquerda) -->
+                <button id="btn-config" class="btn-icon" onclick="abrirModalConfig()" title="Menu Principal">
+                    <i data-lucide="settings" width="22"></i>
+                </button>
+                
                 <h1>Minhas Finanças</h1>
-                <div class="header-actions">
-                    <button id="btn-config" class="btn-icon" onclick="abrirModalConfig()" title="Configurações">
-                        <i data-lucide="settings" width="20"></i>
-                    </button>
-                    <button id="btn-tema" class="btn-icon" onclick="alternarTema()" title="Alterar Tema">
-                        <i id="icone-tema" data-lucide="sun" width="20"></i>
-                    </button>
-                    <button id="btn-exportar" class="btn-icon" onclick="exportarCSV()" title="Exportar Histórico (CSV)">
-                        <i data-lucide="download-cloud" width="20"></i>
-                    </button>
-                </div>
+                
+                <!-- Botão de Adicionar Registro (Direita) -->
+                <button id="btn-abrir-escolha" class="btn-icon primary-icon" onclick="abrirModalEscolha()" title="Novo Registro">
+                    <i data-lucide="plus" width="24"></i>
+                </button>
             </div>
+            
             <div class="month-selector">
                 <button id="btn-prev-month" title="Mês anterior"><i data-lucide="chevron-left" width="20"></i></button>
                 <span id="mes-atual-label">Carregando...</span>
@@ -475,10 +471,6 @@
         </section>
     </div>
 
-    <button id="btn-abrir-escolha" class="fab" title="Novo Registro">
-        <i data-lucide="plus" width="32" height="32"></i>
-    </button>
-
     <!-- MODAL 0: ONBOARDING (BOAS VINDAS E TOUR) -->
     <div id="modal-onboarding" class="modal-backdrop" style="align-items: center;">
         <div class="modal-content" style="border-radius: 28px; padding: 35px 24px; position: relative; max-height: 90vh; overflow-y: auto;">
@@ -500,31 +492,25 @@
             </div>
 
             <div class="onboarding-slide" id="slide-2" style="display: none; text-align: center;">
-                <h3 style="margin-bottom: 5px; font-size: 1.4rem; color: var(--text-main);">Atalhos rápidos</h3>
-                <p style="color: var(--text-muted); font-size: 0.95rem;">Ferramentas poderosas sempre à mão.</p>
+                <h3 style="margin-bottom: 5px; font-size: 1.4rem; color: var(--text-main);">Atalhos no Topo</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Dois botões, todas as ferramentas.</p>
                 <div class="shortcut-list">
                     <div class="shortcut-item">
                         <div class="shortcut-icon-wrapper"><i data-lucide="settings" width="22"></i></div>
                         <div class="shortcut-text">
-                            <h4>Configurações</h4><p>Ajuste o fechamento da fatura.</p>
+                            <h4>Menu (Esquerda)</h4><p>Temas, backup, tutorial e o fechamento do cartão.</p>
                         </div>
                     </div>
                     <div class="shortcut-item">
-                        <div class="shortcut-icon-wrapper"><i data-lucide="sun" width="22"></i></div>
+                        <div class="shortcut-icon-wrapper" style="color: white; background: var(--primary);"><i data-lucide="plus" width="22"></i></div>
                         <div class="shortcut-text">
-                            <h4>Temas Visuais</h4><p>Alterne entre Claro, Médio e Escuro.</p>
-                        </div>
-                    </div>
-                    <div class="shortcut-item">
-                        <div class="shortcut-icon-wrapper"><i data-lucide="download-cloud" width="22"></i></div>
-                        <div class="shortcut-text">
-                            <h4>Backup Seguro</h4><p>Exporte seu histórico para Excel.</p>
+                            <h4>Novo Registro (Direita)</h4><p>Adicione receitas ou despesas num piscar de olhos.</p>
                         </div>
                     </div>
                     <div class="shortcut-item">
                         <div class="shortcut-icon-wrapper"><i data-lucide="edit-2" width="16"></i><i data-lucide="trash-2" width="16"></i></div>
                         <div class="shortcut-text">
-                            <h4>Ações Rápidas</h4><p>Edite ou apague os seus registros.</p>
+                            <h4>Ações nas Listas</h4><p>Clique no lápis para editar ou na lixeira para apagar um item.</p>
                         </div>
                     </div>
                 </div>
@@ -558,14 +544,14 @@
         </div>
     </div>
 
-    <!-- MODAL 1: CONFIGURAÇÕES -->
+    <!-- MODAL 1: MENU DE CONFIGURAÇÕES UNIFICADO -->
     <div id="modal-config" class="modal-backdrop">
         <div class="modal-content">
             <div class="modal-drag-handle"></div>
             <button class="close-modal-btn" onclick="fecharModalConfig()"><i data-lucide="x" width="20"></i></button>
-            <h3 class="modal-title">Configurações</h3>
+            <h3 class="modal-title">Menu Principal</h3>
             
-            <div class="form-group" style="margin-bottom: 25px;">
+            <div class="form-group" style="margin-bottom: 20px;">
                 <label>Dia de Fechamento do Cartão</label>
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4;">
                     <strong>Inteligência Automática:</strong> <br>
@@ -577,13 +563,28 @@
                     <input type="number" id="input-dia-fechamento" placeholder="Ex: 4 ou 25" min="1" max="31">
                 </div>
             </div>
+
+            <!-- OPÇÕES DE TEMA EMBUTIDAS -->
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label>Aparência</label>
+                <div class="payment-toggle" style="height: auto; padding: 4px;">
+                    <button type="button" class="toggle-btn" id="btn-tema-claro" onclick="setTema('claro')" style="padding: 10px 0;"><i data-lucide="sun" width="16"></i> Claro</button>
+                    <button type="button" class="toggle-btn" id="btn-tema-medio" onclick="setTema('medio')" style="padding: 10px 0;"><i data-lucide="moon" width="16"></i> Médio</button>
+                    <button type="button" class="toggle-btn" id="btn-tema-escuro" onclick="setTema('escuro')" style="padding: 10px 0;"><i data-lucide="moon-star" width="16"></i> Escuro</button>
+                </div>
+            </div>
             
-            <button class="btn-primary" onclick="salvarConfiguracoes()"><i data-lucide="save" width="20"></i> Salvar Preferências</button>
+            <!-- BOTÕES EXTRAS (Backup e Tour) -->
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button class="btn-outline" onclick="exportarCSV()" style="flex: 1; margin: 0; font-size: 0.9rem; padding: 12px;">
+                    <i data-lucide="download-cloud" width="18"></i> Backup
+                </button>
+                <button class="btn-outline" onclick="reiniciarTour()" style="flex: 1; margin: 0; font-size: 0.9rem; padding: 12px;">
+                    <i data-lucide="play-circle" width="18"></i> Tutorial
+                </button>
+            </div>
             
-            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 25px 0 20px 0;">
-            <button class="btn-outline" onclick="reiniciarTour()">
-                <i data-lucide="play-circle" width="20"></i> Rever Tutorial Inicial
-            </button>
+            <button class="btn-primary" onclick="salvarConfiguracoes()"><i data-lucide="save" width="20"></i> Salvar e Fechar</button>
         </div>
     </div>
 
@@ -704,28 +705,20 @@
         let abaAtiva = 'corrente';
         let editandoIndex = -1; 
 
-        // TEMA
-        const temas = ['claro', 'medio', 'escuro'];
+        // TEMA CENTRALIZADO
         let temaAtual = localStorage.getItem('minhas_financas_tema') || 'claro';
-        
-        function aplicarTemaInicial() {
-            document.body.setAttribute('data-theme', temaAtual);
-            atualizarIconeTema();
-        }
-        window.alternarTema = function() {
-            let index = temas.indexOf(temaAtual);
-            temaAtual = temas[(index + 1) % temas.length];
+        document.body.setAttribute('data-theme', temaAtual); // Aplica no load
+
+        window.setTema = function(tema) {
+            temaAtual = tema;
             document.body.setAttribute('data-theme', temaAtual);
             localStorage.setItem('minhas_financas_tema', temaAtual);
-            atualizarIconeTema();
+            
+            // Atualiza o estado dos botões de tema no modal
+            document.getElementById('btn-tema-claro').classList.toggle('active', tema === 'claro');
+            document.getElementById('btn-tema-medio').classList.toggle('active', tema === 'medio');
+            document.getElementById('btn-tema-escuro').classList.toggle('active', tema === 'escuro');
         };
-        function atualizarIconeTema() {
-            const iconeEl = document.getElementById('icone-tema');
-            if(temaAtual === 'claro') iconeEl.setAttribute('data-lucide', 'sun');
-            else if(temaAtual === 'medio') iconeEl.setAttribute('data-lucide', 'moon');
-            else iconeEl.setAttribute('data-lucide', 'moon-star');
-            if (window.lucide) lucide.createIcons();
-        }
 
         // DOM ELEMENTS
         const form = document.getElementById('form');
@@ -756,7 +749,6 @@
         const tabCartao = document.getElementById('tab-cartao');
 
         // INICIALIZAÇÃO
-        aplicarTemaInicial();
         if (window.lucide) lucide.createIcons();
 
         // TOUR / ONBOARDING
@@ -775,7 +767,6 @@
                 document.getElementById(`slide-${slideAtual}`).style.display = 'block';
                 document.getElementsByClassName('dot')[slideAtual].classList.add('active');
                 atualizarBotoesOnboarding();
-                if (window.lucide) lucide.createIcons(); 
             } else {
                 salvarOnboarding();
             }
@@ -789,7 +780,6 @@
                 document.getElementById(`slide-${slideAtual}`).style.display = 'block';
                 document.getElementsByClassName('dot')[slideAtual].classList.add('active');
                 atualizarBotoesOnboarding();
-                if (window.lucide) lucide.createIcons();
             }
         }
 
@@ -806,12 +796,12 @@
                 btnVoltar.style.display = 'flex';
                 btnProximo.innerHTML = '<i data-lucide="check" width="20"></i> Concluir';
                 btnPular.style.display = 'none';
+                if (window.lucide) lucide.createIcons();
             } else {
                 btnVoltar.style.display = 'flex';
                 btnProximo.textContent = 'Continuar';
                 btnPular.style.display = 'block';
             }
-            if (window.lucide) lucide.createIcons();
         }
 
         window.salvarOnboarding = function() {
@@ -841,9 +831,12 @@
             setTimeout(() => { modalOnboarding.classList.add('open'); }, 300);
         }
 
-        // CONFIGURAÇÕES
+        // CONFIGURAÇÕES UNIFICADAS
         window.abrirModalConfig = function() {
+            // Puxa o dia
             inputDiaFechamento.value = localStorage.getItem('minhas_financas_dia_fechamento') || '';
+            // Garante que o botão do tema certo está aceso
+            setTema(temaAtual); 
             modalConfig.classList.add('open');
         }
         window.fecharModalConfig = function() { modalConfig.classList.remove('open'); }
@@ -973,6 +966,7 @@
                 }
             });
 
+            // Lançamento virtual do Cartão Pago na Conta Corrente
             if (totalCreditoMes > 0 && faturasPagasData[keyFaturaAtual]) {
                 const liFatura = document.createElement('li');
                 liFatura.style.borderLeft = '5px solid var(--dark-card)';
@@ -1034,6 +1028,10 @@
         }
 
         // --- 7. FLUXO DO FORMULÁRIO (CRIAR E EDITAR) ---
+        window.abrirModalEscolha = function() {
+            modalEscolha.classList.add('open');
+        }
+
         window.selecionarPagamento = function(tipoSelecionado) {
             const btnDebito = document.getElementById('btn-debito');
             const btnCredito = document.getElementById('btn-credito');
@@ -1332,8 +1330,7 @@
             }
         }
 
-        // --- 10. REGISTRO DE EVENTOS (Triggers) ---
-        document.getElementById('btn-abrir-escolha').addEventListener('click', () => modalEscolha.classList.add('open'));
+        // --- 10. EVENTOS BASE ---
         document.getElementById('btn-fechar-escolha').addEventListener('click', fecharModalEscolha);
         document.getElementById('btn-fechar-formulario').addEventListener('click', () => { fecharModalFormulario(); editandoIndex = -1; });
 
@@ -1359,7 +1356,7 @@
 
         form.addEventListener('submit', adicionarTransacao);
 
-        // --- 11. START APP ---
+        // Início Rápido
         setarDataFormulario(new Date());
         atualizarInterface();
     </script>
