@@ -81,13 +81,13 @@
             color: var(--text-main);
             display: flex;
             justify-content: center;
-            padding: 20px 15px 40px 15px; /* Sem espaço extra de FAB */
+            padding: 20px 15px 30px 15px; 
             transition: background-color 0.3s, color 0.3s;
         }
 
         .container { width: 100%; max-width: 500px; }
 
-        /* NOVO CABEÇALHO (2 BOTÕES OPOSTOS) */
+        /* Cabeçalho Limpo */
         header { margin-bottom: 25px; margin-top: 5px; }
 
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -103,12 +103,6 @@
             cursor: pointer; box-shadow: var(--shadow-sm); transition: all 0.2s; flex-shrink: 0;
         }
         .btn-icon:hover { color: var(--primary); border-color: var(--primary); }
-
-        .btn-icon.primary-icon {
-            background: var(--primary); color: white; border: none;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
-        }
-        .btn-icon.primary-icon:hover { background: var(--primary-hover); transform: scale(1.05); color: white; }
 
         .month-selector {
             display: flex; align-items: center; justify-content: center;
@@ -191,25 +185,31 @@
         ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
         
         #lista-corrente, #lista-cartao {
-            max-height: 45vh; overflow-y: auto; padding-right: 6px;
+            max-height: 48vh; overflow-y: auto; padding-right: 6px; padding-bottom: 75px;
         }
         #lista-corrente::-webkit-scrollbar, #lista-cartao::-webkit-scrollbar { width: 6px; }
         #lista-corrente::-webkit-scrollbar-track, #lista-cartao::-webkit-scrollbar-track { background: transparent; }
         #lista-corrente::-webkit-scrollbar-thumb, #lista-cartao::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
         #lista-corrente::-webkit-scrollbar-thumb:hover, #lista-cartao::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
+        /* Estrutura da LI (Clicável) */
         li {
-            background: var(--card-bg); padding: 16px; border-radius: var(--border-radius-sm); flex-shrink: 0;
-            box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center;
-            transition: transform 0.2s, background-color 0.3s;
+            background: var(--card-bg); border-radius: var(--border-radius-sm); flex-shrink: 0;
+            box-shadow: var(--shadow-sm); display: flex; flex-direction: column; align-items: stretch;
+            transition: transform 0.2s, background-color 0.3s; padding: 0; overflow: hidden;
+            cursor: pointer; border: 1px solid transparent;
         }
-        li.empty-message {
-            flex-direction: column; justify-content: center; text-align: center; padding: 40px 20px; gap: 12px; color: var(--text-muted);
-        }
-        li.empty-message i { color: var(--border-color); }
-        li.empty-message span { font-size: 0.95rem; font-weight: 500; }
+        li:active { transform: scale(0.98); } 
+        
+        li.expanded { background: var(--input-bg); border-color: var(--border-color); }
 
-        .item-left { display: flex; align-items: center; gap: 12px; }
+        .item-main {
+            display: flex; justify-content: space-between; align-items: center; padding: 16px;
+            width: 100%; gap: 12px;
+        }
+
+        .item-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+        
         .item-icon {
             width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
         }
@@ -218,22 +218,49 @@
         .icon-credito { background: var(--warning-bg); color: var(--warning); }
         .icon-fatura { background: var(--dark-card); color: white; } 
 
-        .item-info strong { display: block; font-size: 1rem; color: var(--text-main); margin-bottom: 2px; }
-        .item-info small { color: var(--text-muted); font-size: 0.8rem; font-weight: 500; }
+        .item-info { flex: 1; min-width: 0; }
+        
+        .item-info strong { 
+            display: block; font-size: 1rem; color: var(--text-main); margin-bottom: 2px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+        }
+        .item-info small { color: var(--text-muted); font-size: 0.8rem; font-weight: 500; display: block; }
 
-        .item-right { display: flex; align-items: center; gap: 12px; text-align: right; }
+        .item-right { display: flex; align-items: center; gap: 12px; text-align: right; flex-shrink: 0; }
         .item-value span { font-weight: 700; font-size: 1.05rem; white-space: nowrap; }
         .val-receita { color: var(--success); }
         .val-despesa { color: var(--text-main); } 
 
-        /* Botões de Ação */
-        .item-actions { display: flex; gap: 6px; }
-        .action-btn {
-            background: var(--bg-app); color: var(--text-muted); border: none; cursor: pointer; padding: 6px;
-            border-radius: 8px; transition: color 0.2s, background 0.2s; display: flex; align-items: center; justify-content: center;
+        /* GAVETA OCULTA (Botões de Ação lado a lado) */
+        .item-actions-drawer {
+            display: none; padding: 12px 16px 16px 16px; gap: 12px; justify-content: space-between;
+            border-top: 1px solid var(--border-color); width: 100%;
         }
-        .action-btn.edit-btn:hover { color: var(--primary); background: rgba(79, 70, 229, 0.1); }
-        .action-btn.delete-btn:hover { color: var(--danger); background: var(--danger-bg); }
+        
+        li.expanded .item-actions-drawer { display: flex; animation: slideDown 0.2s ease-out; }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .action-btn {
+            flex: 1; /* Ocupa exatamente metade do espaço cada */
+            background: var(--bg-app); color: var(--text-muted); border: 1px solid var(--border-color); 
+            cursor: pointer; padding: 12px 16px; border-radius: 12px; transition: color 0.2s, background 0.2s; 
+            display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 600; font-size: 0.95rem;
+        }
+        .action-btn.edit-btn:hover { color: var(--primary); border-color: var(--primary); background: rgba(79, 70, 229, 0.05); }
+        .action-btn.delete-btn:hover { color: var(--danger); border-color: var(--danger); background: var(--danger-bg); }
+
+        /* MENSAGEM DE LISTA VAZIA (Corrigida) */
+        li.empty-message {
+            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+            padding: 60px 20px; gap: 16px; color: var(--text-muted); width: 100%;
+            background: transparent; box-shadow: none; pointer-events: none; border: none;
+        }
+        li.empty-message i { opacity: 0.5; margin-bottom: 8px; }
+        li.empty-message span { font-size: 0.95rem; font-weight: 500; }
 
         /* Toast */
         #notificacao {
@@ -243,6 +270,22 @@
             display: flex; align-items: center; gap: 8px; white-space: nowrap;
         }
         #notificacao.show { top: 20px; }
+
+        /* BARRA INFERIOR */
+        .bottom-bar {
+            position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
+            width: calc(100% - 40px); max-width: 400px; z-index: 100;
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease;
+        }
+        .bottom-bar.hidden { transform: translate(-50%, 150%); opacity: 0; pointer-events: none; }
+
+        .btn-bottom-add {
+            background: var(--primary); color: white; border: none; border-radius: 16px; 
+            padding: 14px 20px; font-size: 1rem; font-weight: 700; width: 100%;
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35); display: flex; align-items: center;
+            justify-content: center; gap: 8px; cursor: pointer; transition: background-color 0.2s, transform 0.2s;
+        }
+        .btn-bottom-add:hover { background: var(--primary-hover); transform: scale(1.02); }
 
         /* Modais Base */
         .modal-backdrop {
@@ -284,12 +327,10 @@
         .btn-escolha.receita .icon-box { background: var(--success-bg); color: var(--success); }
         .btn-escolha.despesa .icon-box { background: var(--danger-bg); color: var(--danger); }
 
-        /* Formulários (Fintech Style) */
+        /* Formulários */
         form { display: flex; flex-direction: column; gap: 18px; } 
-        
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         .form-group label { font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-left: 4px; }
-        
         .form-row { display: flex; flex-wrap: wrap; gap: 16px; }
 
         .input-box {
@@ -298,15 +339,11 @@
             height: 56px; padding: 0 16px; transition: all 0.2s; cursor: text;
         }
         .input-box.clickable { cursor: pointer; }
-        .input-box:focus-within {
-            border-color: var(--primary); background: var(--card-bg);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
-        }
+        .input-box:focus-within { border-color: var(--primary); background: var(--card-bg); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15); }
 
         .input-box .input-icon { color: var(--text-muted); margin-right: 12px; width: 20px; height: 20px; flex-shrink: 0; }
         .input-box .currency-symbol { color: var(--text-muted); font-weight: 600; margin-right: 8px; font-size: 1.05rem; }
 
-        /* Oculta setinhas nativas */
         input[type="number"]::-webkit-inner-spin-button, 
         input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; }
@@ -317,7 +354,6 @@
         }
         input::placeholder { color: var(--text-muted); opacity: 0.7; font-weight: 400; }
 
-        /* Segmented Control */
         .payment-toggle {
             display: flex; background: var(--input-bg); border: 1px solid var(--border-color);
             border-radius: var(--border-radius-sm); padding: 4px; gap: 4px; height: 56px; width: 100%;
@@ -390,7 +426,6 @@
         }
         .btn-pular:hover { color: var(--text-main); }
 
-        /* Lista de Atalhos Alinhada e Corrigida */
         .shortcut-list { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 20px; text-align: left; }
         .shortcut-item {
             display: flex; align-items: center; background: var(--bg-app); padding: 12px;
@@ -407,20 +442,16 @@
 </head>
 <body data-theme="claro">
     <div class="container">
-        <!-- NOVO CABEÇALHO: Dois botões em lados opostos -->
+        <!-- CABEÇALHO CENTRALIZADO -->
         <header>
             <div class="header-top">
-                <!-- Botão de Configurações Gerais (Esquerda) -->
                 <button id="btn-config" class="btn-icon" onclick="abrirModalConfig()" title="Menu Principal">
                     <i data-lucide="settings" width="22"></i>
                 </button>
                 
                 <h1>Minhas Finanças</h1>
                 
-                <!-- Botão de Adicionar Registro (Direita) -->
-                <button id="btn-abrir-escolha" class="btn-icon primary-icon" onclick="abrirModalEscolha()" title="Novo Registro">
-                    <i data-lucide="plus" width="24"></i>
-                </button>
+                <div style="width: 42px; flex-shrink: 0;"></div>
             </div>
             
             <div class="month-selector">
@@ -471,6 +502,13 @@
         </section>
     </div>
 
+    <!-- NOVA BARRA INFERIOR DE REGISTRO (SOME AO ROLAR PARA BAIXO) -->
+    <div id="bottom-bar" class="bottom-bar">
+        <button class="btn-bottom-add" onclick="abrirModalEscolha()">
+            <i data-lucide="plus-circle" width="20"></i> Adicionar Registro
+        </button>
+    </div>
+
     <!-- MODAL 0: ONBOARDING (BOAS VINDAS E TOUR) -->
     <div id="modal-onboarding" class="modal-backdrop" style="align-items: center;">
         <div class="modal-content" style="border-radius: 28px; padding: 35px 24px; position: relative; max-height: 90vh; overflow-y: auto;">
@@ -492,25 +530,25 @@
             </div>
 
             <div class="onboarding-slide" id="slide-2" style="display: none; text-align: center;">
-                <h3 style="margin-bottom: 5px; font-size: 1.4rem; color: var(--text-main);">Atalhos no Topo</h3>
-                <p style="color: var(--text-muted); font-size: 0.95rem;">Dois botões, todas as ferramentas.</p>
+                <h3 style="margin-bottom: 5px; font-size: 1.4rem; color: var(--text-main);">Atalhos e Gestão</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Onde encontrar o que precisa.</p>
                 <div class="shortcut-list">
                     <div class="shortcut-item">
                         <div class="shortcut-icon-wrapper"><i data-lucide="settings" width="22"></i></div>
                         <div class="shortcut-text">
-                            <h4>Menu (Esquerda)</h4><p>Temas, backup, tutorial e o fechamento do cartão.</p>
+                            <h4>Menu Superior</h4><p>Temas, backup, tutorial e o fechamento do cartão.</p>
                         </div>
                     </div>
                     <div class="shortcut-item">
-                        <div class="shortcut-icon-wrapper" style="color: white; background: var(--primary);"><i data-lucide="plus" width="22"></i></div>
+                        <div class="shortcut-icon-wrapper" style="color: white; background: var(--primary);"><i data-lucide="plus-circle" width="22"></i></div>
                         <div class="shortcut-text">
-                            <h4>Novo Registro (Direita)</h4><p>Adicione receitas ou despesas num piscar de olhos.</p>
+                            <h4>Barra Inferior</h4><p>Adicione receitas ou despesas rapidamente. Ela se esconde ao rolar!</p>
                         </div>
                     </div>
                     <div class="shortcut-item">
-                        <div class="shortcut-icon-wrapper"><i data-lucide="edit-2" width="16"></i><i data-lucide="trash-2" width="16"></i></div>
+                        <div class="shortcut-icon-wrapper"><i data-lucide="mouse-pointer-click" width="22"></i></div>
                         <div class="shortcut-text">
-                            <h4>Ações nas Listas</h4><p>Clique no lápis para editar ou na lixeira para apagar um item.</p>
+                            <h4>Clique para Editar</h4><p>Toque em qualquer registro da lista para abrir os botões de editar e apagar.</p>
                         </div>
                     </div>
                 </div>
@@ -564,7 +602,6 @@
                 </div>
             </div>
 
-            <!-- OPÇÕES DE TEMA EMBUTIDAS -->
             <div class="form-group" style="margin-bottom: 20px;">
                 <label>Aparência</label>
                 <div class="payment-toggle" style="height: auto; padding: 4px;">
@@ -574,7 +611,6 @@
                 </div>
             </div>
             
-            <!-- BOTÕES EXTRAS (Backup e Tour) -->
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                 <button class="btn-outline" onclick="exportarCSV()" style="flex: 1; margin: 0; font-size: 0.9rem; padding: 12px;">
                     <i data-lucide="download-cloud" width="18"></i> Backup
@@ -707,14 +743,13 @@
 
         // TEMA CENTRALIZADO
         let temaAtual = localStorage.getItem('minhas_financas_tema') || 'claro';
-        document.body.setAttribute('data-theme', temaAtual); // Aplica no load
+        document.body.setAttribute('data-theme', temaAtual); 
 
         window.setTema = function(tema) {
             temaAtual = tema;
             document.body.setAttribute('data-theme', temaAtual);
             localStorage.setItem('minhas_financas_tema', temaAtual);
             
-            // Atualiza o estado dos botões de tema no modal
             document.getElementById('btn-tema-claro').classList.toggle('active', tema === 'claro');
             document.getElementById('btn-tema-medio').classList.toggle('active', tema === 'medio');
             document.getElementById('btn-tema-escuro').classList.toggle('active', tema === 'escuro');
@@ -747,9 +782,34 @@
         const viewCartao = document.getElementById('view-cartao');
         const tabCorrente = document.getElementById('tab-corrente');
         const tabCartao = document.getElementById('tab-cartao');
+        
+        const bottomBar = document.getElementById('bottom-bar');
 
         // INICIALIZAÇÃO
         if (window.lucide) lucide.createIcons();
+
+        // SCROLL HIDDEN BAR
+        let lastScroll = 0;
+        function handleScroll(e) {
+            let currentScroll = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
+            
+            if (currentScroll <= 0) {
+                bottomBar.classList.remove('hidden');
+                lastScroll = currentScroll;
+                return;
+            }
+
+            if (currentScroll > lastScroll && currentScroll > 20) {
+                bottomBar.classList.add('hidden');
+            } else {
+                bottomBar.classList.remove('hidden');
+            }
+            lastScroll = currentScroll;
+        }
+
+        listaCorrente.addEventListener('scroll', handleScroll);
+        listaCartao.addEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', handleScroll);
 
         // TOUR / ONBOARDING
         let slideAtual = 0;
@@ -767,6 +827,7 @@
                 document.getElementById(`slide-${slideAtual}`).style.display = 'block';
                 document.getElementsByClassName('dot')[slideAtual].classList.add('active');
                 atualizarBotoesOnboarding();
+                if (window.lucide) lucide.createIcons(); 
             } else {
                 salvarOnboarding();
             }
@@ -780,6 +841,7 @@
                 document.getElementById(`slide-${slideAtual}`).style.display = 'block';
                 document.getElementsByClassName('dot')[slideAtual].classList.add('active');
                 atualizarBotoesOnboarding();
+                if (window.lucide) lucide.createIcons();
             }
         }
 
@@ -796,12 +858,12 @@
                 btnVoltar.style.display = 'flex';
                 btnProximo.innerHTML = '<i data-lucide="check" width="20"></i> Concluir';
                 btnPular.style.display = 'none';
-                if (window.lucide) lucide.createIcons();
             } else {
                 btnVoltar.style.display = 'flex';
                 btnProximo.textContent = 'Continuar';
                 btnPular.style.display = 'block';
             }
+            if (window.lucide) lucide.createIcons();
         }
 
         window.salvarOnboarding = function() {
@@ -833,9 +895,7 @@
 
         // CONFIGURAÇÕES UNIFICADAS
         window.abrirModalConfig = function() {
-            // Puxa o dia
             inputDiaFechamento.value = localStorage.getItem('minhas_financas_dia_fechamento') || '';
-            // Garante que o botão do tema certo está aceso
             setTema(temaAtual); 
             modalConfig.classList.add('open');
         }
@@ -863,6 +923,8 @@
             tabCartao.classList.toggle('active', aba === 'cartao');
             viewCorrente.style.display = aba === 'corrente' ? 'block' : 'none';
             viewCartao.style.display = aba === 'cartao' ? 'block' : 'none';
+            
+            bottomBar.classList.remove('hidden');
         };
 
         function formatarMoeda(valor) { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor); }
@@ -896,6 +958,13 @@
             localStorage.setItem('minhas_financas_faturas_pagas', JSON.stringify(faturasPagasData));
             atualizarInterface();
         };
+
+        window.toggleAcoesItem = function(element) {
+            document.querySelectorAll('#lista-corrente li, #lista-cartao li').forEach(el => {
+                if (el !== element) el.classList.remove('expanded');
+            });
+            element.classList.toggle('expanded');
+        }
 
         function atualizarInterface() {
             const anoSelecionado = dataVisualizacao.getFullYear();
@@ -944,20 +1013,25 @@
                     let tipoTexto = isReceita ? 'Receita' : (isCredito ? 'Crédito' : 'Débito');
 
                     const li = document.createElement('li');
+                    li.onclick = function() { toggleAcoesItem(this); };
+                    
                     li.innerHTML = `
-                        <div class="item-left">
-                            <div class="item-icon ${classeIcone}"><i data-lucide="${iconeNome}" width="20"></i></div>
-                            <div class="item-info">
-                                <strong>${transacao.desc}</strong>
-                                <small>${formatarData(transacao.data)} • ${tipoTexto}</small>
+                        <div class="item-main">
+                            <div class="item-left">
+                                <div class="item-icon ${classeIcone}"><i data-lucide="${iconeNome}" width="20"></i></div>
+                                <div class="item-info">
+                                    <strong>${transacao.desc}</strong>
+                                    <small>${formatarData(transacao.data)} • ${tipoTexto}</small>
+                                </div>
+                            </div>
+                            <div class="item-right">
+                                <div class="item-value"><span class="${classeValor}">${sinal} ${formatarMoeda(transacao.valor)}</span></div>
                             </div>
                         </div>
-                        <div class="item-right">
-                            <div class="item-value"><span class="${classeValor}">${sinal} ${formatarMoeda(transacao.valor)}</span></div>
-                            <div class="item-actions">
-                                <button class="action-btn edit-btn" onclick="editarTransacao(${indiceReal})" title="Editar"><i data-lucide="edit-2" width="16"></i></button>
-                                <button class="action-btn delete-btn" onclick="removerTransacao(${indiceReal})" title="Remover"><i data-lucide="trash-2" width="16"></i></button>
-                            </div>
+                        
+                        <div class="item-actions-drawer">
+                            <button class="action-btn edit-btn" onclick="event.stopPropagation(); editarTransacao(${indiceReal})"><i data-lucide="edit-2" width="16"></i> Editar</button>
+                            <button class="action-btn delete-btn" onclick="event.stopPropagation(); removerTransacao(${indiceReal})"><i data-lucide="trash-2" width="16"></i> Apagar</button>
                         </div>
                     `;
                     
@@ -966,21 +1040,21 @@
                 }
             });
 
-            // Lançamento virtual do Cartão Pago na Conta Corrente
             if (totalCreditoMes > 0 && faturasPagasData[keyFaturaAtual]) {
                 const liFatura = document.createElement('li');
                 liFatura.style.borderLeft = '5px solid var(--dark-card)';
                 liFatura.innerHTML = `
-                    <div class="item-left">
-                        <div class="item-icon icon-fatura"><i data-lucide="check-circle" width="20"></i></div>
-                        <div class="item-info">
-                            <strong>Pagamento da Fatura</strong>
-                            <small>Cartão de Crédito</small>
+                    <div class="item-main">
+                        <div class="item-left">
+                            <div class="item-icon icon-fatura"><i data-lucide="check-circle" width="20"></i></div>
+                            <div class="item-info">
+                                <strong>Pagamento da Fatura</strong>
+                                <small>Cartão de Crédito</small>
+                            </div>
                         </div>
-                    </div>
-                    <div class="item-right">
-                        <div class="item-value"><span class="val-despesa">- ${formatarMoeda(totalCreditoMes)}</span></div>
-                        <div style="width: 76px;"></div> 
+                        <div class="item-right">
+                            <div class="item-value"><span class="val-despesa">- ${formatarMoeda(totalCreditoMes)}</span></div>
+                        </div>
                     </div>
                 `;
                 listaCorrente.insertBefore(liFatura, listaCorrente.firstChild);
