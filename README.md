@@ -1,44 +1,51 @@
-# 💰 Minhas Finanças - Gerenciador Financeiro Pessoal
+# 💰 Minhas Finanças - Gestão Pessoal Inteligente (Brasil)
 
-Um aplicativo web de controle financeiro com design premium (estilo "fintech") construído inteiramente com HTML, CSS e JavaScript puros (Vanilla). Focado em performance, usabilidade *mobile-first* e privacidade.
-
-## ✨ Funcionalidades Principais
-
-* **Dashboard Intuitivo:** Visão clara do Saldo Acumulado, Receitas, Débitos e Créditos do mês atual.
-* **Organização em Abas:** Separação visual limpa entre as movimentações da **Conta Corrente** (Débito/Pix/Receitas) e os gastos do **Cartão de Crédito**.
-* **Inteligência de Cartão de Crédito:** * Configuração personalizada do **dia de fechamento** da fatura.
-  * Lançamento automático de compras para a fatura do mês correto (suporta cartões que fecham tanto no início quanto no final do mês).
-  * Botão de **"Pagar Fatura"** que gera uma transação inteligente, debitando o valor total do cartão diretamente do saldo da sua conta corrente.
-* **UI/UX Avançada (Livre de visuais nativos):**
-  * Formulários com *Segmented Controls* (botões lado a lado) no lugar de caixas de seleção antigas.
-  * **Custom DatePicker:** Calendário próprio do aplicativo para seleção de datas, ignorando o calendário padrão feio dos navegadores.
-  * Animações suaves e janelas modais deslizantes (*Bottom Sheets*).
-  * **Tour de Boas-Vindas:** Um *Onboarding* animado para ensinar atalhos e realizar a primeira configuração.
-* **Suporte a Temas:** Alternância instantânea entre os modos **Claro ☀️**, **Médio 🌙** (Slate) e **Escuro ✨** (OLED).
-* **Gestão de Dados Completa:** * Edição rápida (puxando os dados antigos para o formulário) e exclusão de transações.
-  * **Backup Seguro:** Exportação de todo o histórico financeiro para o Excel no formato `.CSV`.
-* **100% Offline e Privado:** Sem bancos de dados em nuvem. Tudo fica salvo de forma persistente no `LocalStorage` do seu próprio dispositivo.
-
-## 🚀 Como Usar (Instalação Zero)
-
-A beleza deste projeto é a ausência de dependências, compiladores ou *build steps*. 
-
-1. Baixe o arquivo `index.html`.
-2. Dê um duplo clique para abrir no seu navegador favorito (Chrome, Edge, Safari).
-3. **Dica Pro (Mobile):** Abra o arquivo no navegador do seu celular e selecione a opção **"Adicionar à Tela Inicial"**. Ele se comportará como um aplicativo nativo de verdade!
-
-## 🛠 Tecnologias Utilizadas
-
-* **HTML5:** Estrutura e semântica.
-* **CSS3:** Estilização com foco em Variáveis Globais (`:root`), Flexbox, CSS Grid e animações (`@keyframes`).
-* **JavaScript (ES6+):** Toda a lógica de regras de negócios, paginação de meses, cálculos de fatura e manipulação do DOM.
-* **Lucide Icons:** (Via CDN) Biblioteca minimalista para a iconografia do aplicativo.
-* **Window.localStorage:** Armazenamento de dados no cliente de forma eficiente e síncrona.
-
-## 💡 A "Mágica" do Fechamento da Fatura
-
-O sistema foi programado com um algoritmo bifurcado para entender o comportamento de diferentes emissores de cartão:
-* **Cartões de "Fim de mês" (Ex: fecham dia 25):** Compras feitas a partir do dia 25 são automaticamente calculadas como dívidas da fatura do *mês seguinte*.
-* **Cartões de "Início de mês" (Ex: fecham dia 4):** Compras feitas antes do dia 4 são jogadas para a fatura do *mês anterior*, ajustando-se à realidade bancária.
+O **Minhas Finanças** é um aplicativo web focado em dispositivos móveis, privacidade e segurança. Com design premium inspirado nas melhores fintechs brasileiras, ele permite o controle total de faturas de cartão de crédito e saldo bancário de forma 100% local e offline.
 
 ---
+
+## ✨ Diferenciais do Projeto
+
+- **Tour Visual Passo a Passo:** Guia interativo que ensina cada botão da interface através de ilustrações dinâmicas.
+- **Segurança Biométrica (WebAuthn):** Utilize Face ID, Touch ID ou o PIN do seu celular para proteger seus dados financeiros localmente.
+- **Gaveta Lateral Dinâmica (Drawer):** Menu de configurações moderno que desliza da esquerda.
+- **Privacidade Serverless:** Seus dados nunca saem do seu dispositivo; tudo fica armazenado no `LocalStorage` do seu navegador.
+- **Ciclo de Fatura Inteligente:** Configure o fechamento do seu cartão e deixe o app calcular parcelas e vencimentos automaticamente baseado no dia da compra.
+- **Modo Escuro (Dark Mode):** Interface adaptável que respeita a preferência do sistema operacional.
+
+---
+
+## 🚀 Funcionalidades Principais
+
+- **Dashboard de Saldo:** Visão clara de quanto você tem em conta versus quanto deve no cartão.
+- **Resumo de Entradas/Saídas:** Monitoramento rápido da saúde financeira mensal.
+- **Parcelamentos Automáticos:** Registre uma compra parcelada uma única vez e o app distribui as parcelas nos meses futuros.
+- **Pagamento de Fatura Integrado:** Botão contextual no card do cartão para quitar a fatura, abatendo o valor do saldo em conta automaticamente.
+- **Backup JSON:** Exporte ou importe seus dados em um arquivo inofensivo para troca de aparelhos ou segurança extra.
+
+---
+
+## 🛠️ Tecnologias
+
+- **Frontend:** HTML5, CSS3, JavaScript (ES6+).
+- **Estilização:** [Tailwind CSS](https://tailwindcss.com/) (Moderno, Responsivo e Leve).
+- **APIs Web:** LocalStorage, Web Authentication API, Crypto API, File Reader API.
+
+---
+
+## 📦 Como Instalar
+
+Este é um projeto de **Arquivo Único**, ideal para o **GitHub Pages**.
+
+1. Faça o download do arquivo `index.html`.
+2. Hospede no seu repositório ou abra localmente no navegador.
+3. No celular, use a opção **"Adicionar à Tela de Início"** no seu navegador (Safari ou Chrome) para ter a experiência completa de um App nativo instalado.
+
+---
+**Desenvolvido com foco em UX Premium e Privacidade de Dados.**
+
+### O que mudou no Tutorial Visual:
+- **Passo 4 (Fatura & Fechamento):** Agora explica explicitamente que o dia de fechamento define se a compra vai para o mês atual ou para o próximo.
+- **Passo 5 e 6:** Mostram os ícones da **Engrenagem** e do **Sinal de Mais** exatamente como eles aparecem na base da tela, explicando que um serve para Ajustes/Biometria e o outro para Lançamentos.
+
+Agora a sua aplicação está completa, segura, personalizada para o Brasil e totalmente explicada para qualquer novo usuário!
