@@ -43,9 +43,3 @@ Este é um projeto de **Arquivo Único**, ideal para o **GitHub Pages**.
 
 ---
 **Desenvolvido com foco em UX Premium e Privacidade de Dados.**
-
-### O que mudou no Tutorial Visual:
-- **Passo 4 (Fatura & Fechamento):** Agora explica explicitamente que o dia de fechamento define se a compra vai para o mês atual ou para o próximo.
-- **Passo 5 e 6:** Mostram os ícones da **Engrenagem** e do **Sinal de Mais** exatamente como eles aparecem na base da tela, explicando que um serve para Ajustes/Biometria e o outro para Lançamentos.
-
-Agora a sua aplicação está completa, segura, personalizada para o Brasil e totalmente explicada para qualquer novo usuário!
