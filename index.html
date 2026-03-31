@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- Política de Segurança de Conteúdo (CSP) -->
+    <!-- CSP Segura para proteção contra scripts maliciosos -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline';">
-    <title>Finanças Pro - Premium</title>
+    <title>Minhas Finanças</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -18,15 +18,14 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .active-scale:active { transform: scale(0.94); transition: transform 0.1s ease-out; }
         
-        /* Animações Modais (Vertical) */
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         
-        /* Animação Gaveta Lateral (Esquerda) */
+        /* Gaveta deslizando da esquerda */
         .drawer-transition { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
 
         .custom-date-input::-webkit-calendar-picker-indicator {
             background: transparent; bottom: 0; color: transparent; cursor: pointer;
@@ -35,21 +34,43 @@
         .date-wrapper { position: relative; }
         .bg-hero-gradient { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
         .bg-card-gradient { background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%); }
+
+        .dot { width: 8px; height: 8px; border-radius: 999px; background: rgba(255,255,255,0.2); transition: all 0.3s; }
+        .dot.active { width: 24px; background: #3b82f6; }
+
+        @keyframes pulse-custom { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } }
+        .pulse-highlight { animation: pulse-custom 2s infinite; }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans min-h-screen pb-32 transition-colors duration-300 selection:bg-blue-200 overflow-x-hidden">
 
-    <!-- ECRÃ DE BLOQUEIO BIOMÉTRICO -->
+    <!-- TUTORIAL CONTEXTUAL -->
+    <div id="tutorial-overlay" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl z-[300] hidden flex flex-col items-center justify-center p-8 text-white">
+        <div id="tutorial-card" class="w-full max-w-sm text-center animate-slide-up">
+            <div id="tutorial-visual-area" class="h-48 flex flex-col items-center justify-center mb-8">
+                <!-- Visualização dinâmica via JS -->
+            </div>
+            <h2 id="tutorial-title" class="text-3xl font-black mb-4 tracking-tighter uppercase"></h2>
+            <p id="tutorial-desc" class="text-slate-400 font-medium leading-relaxed mb-12 px-4"></p>
+            <div class="flex flex-col gap-4">
+                <button onclick="nextTutorialStep()" id="tutorial-next-btn" class="w-full py-5 bg-blue-600 text-white rounded-[1.5rem] font-black shadow-2xl active-scale">Entendi</button>
+                <button onclick="skipTutorial()" class="w-full py-2 text-slate-500 font-bold uppercase text-[10px] tracking-widest active-scale">Pular Tour</button>
+            </div>
+            <div class="flex justify-center gap-2 mt-8" id="tutorial-dots-container"></div>
+        </div>
+    </div>
+
+    <!-- BLOQUEIO BIOMÉTRICO (WebAuthn) -->
     <div id="lock-screen" class="fixed inset-0 bg-slate-900 z-[100] flex flex-col items-center justify-center transition-opacity duration-500 hidden">
         <div class="w-24 h-24 bg-blue-600/20 rounded-full flex items-center justify-center mb-6 animate-pulse">
             <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-blue-600/50">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
             </div>
         </div>
-        <h2 class="text-3xl font-black text-white mb-2 tracking-tighter">Finanças Pro</h2>
-        <p class="text-slate-400 font-medium mb-12 uppercase tracking-widest text-[10px]">Acesso Restrito</p>
+        <h2 class="text-3xl font-black text-white mb-2 tracking-tighter">Minhas Finanças</h2>
+        <p class="text-slate-400 font-medium mb-12 uppercase tracking-widest text-[10px]">Proteção Ativa</p>
         <button type="button" onclick="verifyWebAuthn()" class="bg-blue-600 text-white px-10 py-4 rounded-2xl font-black active-scale shadow-xl shadow-blue-900/50 focus:outline-none flex items-center gap-3">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2"/></svg>
             Desbloquear
         </button>
         <p id="lock-error-msg" class="text-rose-500 text-xs font-bold mt-6 hidden opacity-0 transition-opacity">Tente novamente.</p>
@@ -60,47 +81,37 @@
         <div class="max-w-md mx-auto">
             <div class="flex justify-between items-center mb-8 text-white/90 px-2">
                 <button type="button" onclick="changeMonth(-1)" class="p-3 active-scale rounded-2xl bg-white/10 hover:bg-white/20 transition-colors focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="3"/></svg>
                 </button>
                 <div class="text-center">
-                    <p class="text-[9px] font-black text-blue-200 uppercase tracking-[0.2em] mb-0.5">Visão Mensal</p>
+                    <p class="text-[9px] font-black text-blue-200 uppercase tracking-[0.2em] mb-0.5">Calendário</p>
                     <h1 id="current-month-display" class="font-black text-xl tracking-tight uppercase">Março 2026</h1>
                 </div>
                 <button type="button" onclick="changeMonth(1)" class="p-3 active-scale rounded-2xl bg-white/10 hover:bg-white/20 transition-colors focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="3"/></svg>
                 </button>
             </div>
             <div class="text-center text-white">
                 <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-200 mb-1">Saldo em Conta</p>
-                <h2 id="balance-total" class="text-4xl sm:text-5xl font-black tracking-tighter truncate w-full px-4">R$ 0,00</h2>
+                <h2 id="balance-total" class="text-4xl sm:text-5xl font-black tracking-tighter truncate w-full px-4 text-center tracking-widest">R$ 0,00</h2>
             </div>
         </div>
     </header>
 
-    <!-- CARDS SOBREPOSTOS -->
+    <!-- DASHBOARD -->
     <main class="max-w-md mx-auto px-5 -mt-12 relative z-20 pb-32">
         <div class="grid grid-cols-2 gap-4 mb-6">
             <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-800 flex flex-col justify-center">
-                <div class="flex items-center gap-2 mb-2">
-                    <div class="w-6 h-6 bg-emerald-100 dark:bg-emerald-950 rounded-full flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
-                    </div>
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Entradas</p>
-                </div>
+                <p class="text-[10px] font-black text-emerald-600 dark:text-emerald-500 uppercase tracking-widest mb-1">Entradas</p>
                 <p id="month-income" class="text-[1.1rem] font-black text-slate-800 dark:text-white truncate">R$ 0,00</p>
             </div>
             <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-800 flex flex-col justify-center">
-                <div class="flex items-center gap-2 mb-2">
-                    <div class="w-6 h-6 bg-rose-100 dark:bg-rose-950 rounded-full flex items-center justify-center text-rose-600 dark:text-rose-400">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
-                    </div>
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Saídas</p>
-                </div>
+                <p class="text-[10px] font-black text-rose-600 dark:text-rose-500 uppercase tracking-widest mb-1">Saídas</p>
                 <p id="month-expense" class="text-[1.1rem] font-black text-slate-800 dark:text-white truncate">R$ 0,00</p>
             </div>
         </div>
 
-        <div id="card-fatura" class="bg-card-gradient p-7 rounded-[2rem] shadow-xl shadow-purple-500/20 text-white relative overflow-hidden transition-all duration-500 mb-8">
+        <div id="card-fatura" class="bg-card-gradient p-7 rounded-[2rem] shadow-xl shadow-purple-500/20 text-white relative overflow-hidden mb-8 transition-all duration-500">
             <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
             <div class="flex justify-between items-start relative z-10">
                 <div class="flex-1 min-w-0 pr-4">
@@ -108,26 +119,25 @@
                     <h3 id="bill-total" class="text-3xl font-black truncate w-full">R$ 0,00</h3>
                     <p id="closing-label" class="text-[10px] font-bold text-purple-100/70 mt-1 uppercase tracking-wider">Fecha dia 04</p>
                 </div>
-                <div class="shrink-0 w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                <div class="shrink-0 w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-inner">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-width="2.5"/></svg>
                 </div>
             </div>
-            <button type="button" id="btn-pay-bill" onclick="openPayBillModal()" class="hidden relative z-10 mt-6 bg-white text-purple-600 text-[11px] font-black py-4 px-4 rounded-2xl active-scale w-full uppercase tracking-widest transition-all shadow-lg focus:outline-none">
+            <button type="button" id="btn-pay-bill" onclick="openPayBillModal()" class="hidden relative z-10 mt-6 bg-white text-purple-600 text-[11px] font-black py-4 px-4 rounded-2xl active-scale w-full uppercase tracking-widest shadow-lg focus:outline-none">
                 Pagar Fatura Agora
             </button>
         </div>
 
-        <!-- Seletor de Contexto -->
         <div class="flex items-center justify-between bg-slate-200/50 dark:bg-slate-900 rounded-2xl p-1 mb-6 mt-8 border border-slate-200/50 dark:border-slate-800 transition-colors">
             <button type="button" onclick="toggleContext()" class="p-4 text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-white active-scale focus:outline-none transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="3"/></svg>
             </button>
             <div class="text-center flex-1">
-                <p class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5">Visualizando</p>
+                <p class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5">Histórico Ativo</p>
                 <h3 id="context-display" class="font-black text-[13px] text-slate-700 dark:text-slate-100 uppercase tracking-widest">Conta Corrente</h3>
             </div>
             <button type="button" onclick="toggleContext()" class="p-4 text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-white active-scale focus:outline-none transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="3"/></svg>
             </button>
         </div>
 
@@ -135,66 +145,58 @@
     </main>
 
     <!-- FABs SIMÉTRICOS -->
-    <!-- Botão Configurações (Esquerda) -->
-    <button type="button" onclick="toggleConfig(true)" class="fixed bottom-8 left-6 w-12 h-12 bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 rounded-full shadow-xl flex items-center justify-center active-scale transition-transform z-40 focus:outline-none ring-2 ring-slate-100 dark:ring-slate-800">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+    <button type="button" id="fab-settings" onclick="toggleConfig(true)" class="fixed bottom-8 left-6 w-12 h-12 bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 rounded-full shadow-xl flex items-center justify-center active-scale transition-transform z-40 focus:outline-none ring-2 ring-slate-100 dark:ring-slate-800">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
     </button>
 
-    <!-- Botão Adicionar (Direita) -->
-    <button type="button" onclick="openModal()" class="fixed bottom-8 right-6 w-12 h-12 bg-blue-600 text-white rounded-full shadow-2xl shadow-blue-500/40 dark:shadow-none flex items-center justify-center active-scale transition-transform z-40 focus:outline-none ring-4 ring-white dark:ring-slate-950">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M12 4v16m8-8H4"/></svg>
+    <button type="button" id="fab-add" onclick="openModal()" class="fixed bottom-8 right-6 w-12 h-12 bg-blue-600 text-white rounded-full shadow-2xl shadow-blue-500/40 dark:shadow-none flex items-center justify-center active-scale transition-transform z-40 focus:outline-none ring-4 ring-white dark:ring-slate-950">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-width="4"/></svg>
     </button>
 
-    <!-- GAVETA LATERAL (ESQUERDA) -->
+    <!-- DRAWER LATERAL (ESQUERDA) -->
     <div id="config-drawer-overlay" class="fixed inset-0 bg-slate-900/70 dark:bg-black/85 z-[70] hidden backdrop-blur-sm transition-opacity opacity-0 duration-300" onclick="toggleConfig(false)">
-        <!-- Alterado para left-0 e translate-x negativo -->
         <div id="config-drawer" class="fixed left-0 top-0 bottom-0 w-[85%] max-w-sm bg-white dark:bg-slate-900 shadow-2xl transform -translate-x-full drawer-transition flex flex-col z-[80]" onclick="event.stopPropagation()">
             <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50">
-                <h3 class="font-black text-xl text-slate-800 dark:text-white tracking-tighter uppercase">Ajustes</h3>
-                <!-- Botão de fechar orientado para fechar à esquerda -->
+                <h3 class="font-black text-xl text-slate-800 dark:text-white tracking-tighter uppercase">Minhas Finanças</h3>
                 <button type="button" onclick="toggleConfig(false)" class="p-2 bg-white dark:bg-slate-800 rounded-xl text-slate-400 dark:text-slate-500 active-scale shadow-sm">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5"/></svg>
                 </button>
             </div>
             
             <div class="flex-1 overflow-y-auto no-scrollbar p-6 space-y-6">
                 <div class="space-y-3">
                     <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Segurança</p>
-                    <button type="button" id="btn-toggle-auth" onclick="toggleWebAuthn()" class="w-full p-4 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white rounded-2xl font-black text-xs uppercase active-scale flex items-center justify-between border border-transparent transition-all">
+                    <button type="button" id="btn-toggle-auth" onclick="toggleWebAuthn()" class="w-full p-4 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white rounded-2xl font-black text-xs uppercase active-scale flex items-center justify-between border border-transparent">
                         <span>Biometria / PIN</span>
-                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-width="2"/></svg>
                     </button>
                 </div>
-
                 <div class="space-y-3">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Interface</p>
-                    <div class="flex gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200/50 dark:border-slate-800">
-                        <button type="button" id="btn-theme-light" onclick="setTheme('light')" class="flex-1 py-3 rounded-xl font-black text-xs uppercase transition-all">Claro</button>
-                        <button type="button" id="btn-theme-dark" onclick="setTheme('dark')" class="flex-1 py-3 rounded-xl font-black text-xs uppercase transition-all">Escuro</button>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Aparência</p>
+                    <div class="flex gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl">
+                        <button type="button" id="btn-theme-light" onclick="setTheme('light')" class="flex-1 py-3 rounded-xl font-black text-xs transition-all uppercase">Claro</button>
+                        <button type="button" id="btn-theme-dark" onclick="setTheme('dark')" class="flex-1 py-3 rounded-xl font-black text-xs transition-all uppercase">Escuro</button>
                     </div>
                 </div>
-
                 <div class="space-y-3">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Cartão</p>
-                    <div class="p-4 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-between border border-slate-200/20 dark:border-slate-800">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Cartão de Crédito</p>
+                    <div class="p-4 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-between border border-slate-200/50 dark:border-slate-800">
                         <span class="text-xs font-bold text-slate-500">Dia Fechamento</span>
                         <input type="number" id="closing-day-input" min="1" max="31" class="w-14 bg-white dark:bg-slate-950 text-center font-black text-lg p-2 rounded-xl text-blue-600 focus:outline-none">
                     </div>
                 </div>
-
-                <div class="space-y-3">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Dados LocalStorage</p>
+                <div class="space-y-3 text-center">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Backup Permanente</p>
                     <div class="grid grid-cols-2 gap-3">
-                        <button type="button" onclick="exportBackup()" class="p-4 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl font-black text-[10px] uppercase active-scale border border-blue-100 dark:border-blue-900/30">Exportar</button>
+                        <button type="button" onclick="exportBackup()" class="p-4 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl font-black text-[10px] uppercase active-scale">Exportar</button>
                         <button type="button" onclick="document.getElementById('import-file').click()" class="p-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-2xl font-black text-[10px] uppercase active-scale">Importar</button>
                         <input type="file" id="import-file" class="hidden" accept=".json" onchange="importBackup(event)">
                     </div>
                     <p id="backup-msg" class="text-[10px] font-bold text-center mt-2 hidden"></p>
                 </div>
             </div>
-
             <div class="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-                <button type="button" onclick="saveConfig()" class="w-full bg-blue-600 text-white p-5 rounded-2xl font-black active-scale shadow-xl shadow-blue-500/20">Salvar Tudo</button>
+                <button type="button" onclick="saveConfig()" class="w-full bg-blue-600 text-white p-5 rounded-2xl font-black active-scale shadow-xl shadow-blue-500/20 uppercase tracking-widest text-xs">Salvar Tudo</button>
             </div>
         </div>
     </div>
@@ -203,45 +205,44 @@
     <div id="modal" class="fixed inset-0 bg-slate-900/60 dark:bg-black/80 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm transition-opacity duration-300 opacity-0">
         <div id="modal-content" class="bg-white dark:bg-slate-900 w-full max-w-md p-6 rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl transform transition-transform duration-300 translate-y-full flex flex-col max-h-[92vh]">
             <div class="flex justify-between items-center mb-6 px-1 shrink-0">
-                <h3 id="modal-title" class="text-xl font-black text-slate-800 dark:text-white">Lançamento</h3>
-                <button type="button" onclick="closeModal()" class="w-8 h-8 bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-600 rounded-full flex items-center justify-center active-scale transition-colors focus:outline-none">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                <h3 id="modal-title" class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tighter">Lançamento</h3>
+                <button type="button" onclick="closeModal()" class="w-8 h-8 bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-600 rounded-full flex items-center justify-center active-scale transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2.5"/></svg>
                 </button>
             </div>
 
             <form id="finance-form" onsubmit="handleFormSubmit(event)" class="space-y-4 overflow-y-auto no-scrollbar pb-6 px-1">
                 <input type="hidden" id="edit-id">
-                
-                <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 transition-all focus-within:border-blue-500">
+                <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 focus-within:border-blue-500 transition-all">
                     <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase mb-1 tracking-widest">Valor (R$)</label>
                     <input type="number" step="0.01" id="amount" required placeholder="0,00" inputmode="decimal" class="bg-transparent w-full text-4xl font-black focus:outline-none text-blue-600 dark:text-blue-400 truncate">
                 </div>
-                <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 transition-all focus-within:border-blue-500">
+                <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 focus-within:border-blue-500 transition-all">
                     <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase mb-1 tracking-widest">Descrição</label>
                     <input type="text" id="description" required placeholder="Ex: Mercado, Aluguel..." class="bg-transparent w-full font-bold text-lg focus:outline-none text-slate-800 dark:text-white truncate">
                 </div>
-                <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 relative date-wrapper focus-within:border-blue-500">
+                <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 relative date-wrapper focus-within:border-blue-500 transition-all">
                     <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase mb-1 tracking-widest">Data</label>
                     <input type="date" id="date" required class="custom-date-input bg-transparent w-full font-bold text-lg focus:outline-none text-slate-800 dark:text-white uppercase">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest text-center">Tipo</label>
-                        <div class="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl">
-                            <button type="button" id="btn-type-despesa" onclick="setFormType('despesa')" class="flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Despesa</button>
-                            <button type="button" id="btn-type-receita" onclick="setFormType('receita')" class="flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Receita</button>
+                    <div class="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
+                        <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase mb-2 text-center tracking-widest">Tipo</label>
+                        <div class="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-200/50 dark:border-slate-800">
+                            <button type="button" id="btn-type-despesa" onclick="setFormType('despesa')" class="flex-1 py-3 rounded-xl font-black text-[10px] uppercase transition-all">Despesa</button>
+                            <button type="button" id="btn-type-receita" onclick="setFormType('receita')" class="flex-1 py-3 rounded-xl font-black text-[10px] uppercase transition-all">Receita</button>
                         </div>
                     </div>
                     <div id="origin-box">
-                        <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase mb-2 tracking-widest text-center">Pagamento</label>
-                        <div class="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl">
-                            <button type="button" id="btn-origin-conta" onclick="setFormOrigin('conta')" class="flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all truncate px-1">Conta</button>
-                            <button type="button" id="btn-origin-cartao" onclick="setFormOrigin('cartao')" class="flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all truncate px-1">Cartão</button>
+                        <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase mb-2 text-center tracking-widest">Pagamento</label>
+                        <div class="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-200/50 dark:border-slate-800">
+                            <button type="button" id="btn-origin-conta" onclick="setFormOrigin('conta')" class="flex-1 py-3 rounded-xl font-black text-[10px] uppercase transition-all truncate px-1">Conta</button>
+                            <button type="button" id="btn-origin-cartao" onclick="setFormOrigin('cartao')" class="flex-1 py-3 rounded-xl font-black text-[10px] uppercase transition-all truncate px-1">Cartão</button>
                         </div>
                     </div>
                 </div>
                 <div id="installments-box" class="hidden mt-4 bg-purple-50 dark:bg-purple-900/10 p-5 rounded-[1.5rem] border border-purple-100 dark:border-purple-800/30 text-center animate-fade-in">
-                    <label class="block text-[10px] font-black text-purple-600 dark:text-purple-400 uppercase mb-3 tracking-widest">Parcelas</label>
+                    <label class="block text-[10px] font-black text-purple-600 dark:text-purple-400 uppercase mb-3 tracking-widest font-bold">Parcelas</label>
                     <div class="flex overflow-x-auto gap-3 pb-2 no-scrollbar px-1 snap-x" id="installments-container"></div>
                 </div>
                 <button type="submit" id="save-btn" class="w-full bg-blue-600 text-white p-5 rounded-2xl font-black text-lg active-scale shadow-xl shadow-blue-500/20 mt-4 transition-all shrink-0">Confirmar</button>
@@ -249,165 +250,99 @@
         </div>
     </div>
 
-    <!-- MODAL CONFIRMAÇÕES (PAGAMENTO E EXCLUSÃO) -->
-    <div id="pay-bill-modal" class="fixed inset-0 bg-slate-900/70 dark:bg-black/80 z-[90] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300 opacity-0">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-sm p-8 rounded-[2.5rem] shadow-2xl text-center animate-slide-up">
-            <div class="w-20 h-20 bg-emerald-50 dark:bg-emerald-950 rounded-full flex items-center justify-center mx-auto mb-5 text-emerald-500">
-                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            </div>
-            <h3 class="font-black text-2xl mb-2 text-slate-800 dark:text-white tracking-tighter">Pagar Fatura</h3>
-            <p class="text-slate-500 dark:text-slate-400 mb-8 font-medium px-4">Deseja confirmar o pagamento de <strong id="pay-bill-amount-display" class="text-slate-900 dark:text-white text-3xl font-black block mt-2 truncate"></strong></p>
-            <div class="space-y-3 px-2">
-                <button type="button" onclick="confirmPayBill()" class="w-full bg-emerald-500 text-white p-5 rounded-2xl font-black text-lg active-scale shadow-lg">Confirmar</button>
-                <button type="button" onclick="closeGenericModal('pay-bill-modal')" class="w-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 p-4 rounded-2xl font-black active-scale">Cancelar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="delete-modal" class="fixed inset-0 bg-slate-900/70 dark:bg-black/80 z-[90] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300 opacity-0">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-sm p-8 rounded-[2.5rem] shadow-2xl text-center animate-slide-up">
-            <div class="w-20 h-20 bg-rose-50 dark:bg-rose-950 rounded-full flex items-center justify-center mx-auto mb-5 text-rose-500">
-                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-            </div>
-            <h3 class="font-black text-2xl mb-2 text-slate-800 dark:text-white tracking-tighter">Excluir</h3>
-            <p id="delete-message" class="text-slate-500 dark:text-slate-400 mb-8 font-medium leading-relaxed px-4 text-sm text-center"></p>
-            <input type="hidden" id="delete-target-id">
-            <input type="hidden" id="delete-target-group">
-            <div id="delete-actions-normal" class="space-y-3 px-2">
-                <button type="button" onclick="confirmDeleteNormal()" class="w-full bg-rose-500 text-white p-5 rounded-2xl font-black text-lg active-scale shadow-lg">Sim, excluir</button>
-                <button type="button" onclick="closeGenericModal('delete-modal')" class="w-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 p-4 rounded-2xl font-black active-scale">Cancelar</button>
-            </div>
-            <div id="delete-actions-group" class="space-y-3 hidden px-2">
-                <button type="button" onclick="confirmDeleteGroup(true)" class="w-full bg-rose-500 text-white p-5 rounded-2xl font-black text-[15px] active-scale shadow-lg">Excluir TODAS as parcelas</button>
-                <button type="button" onclick="confirmDeleteGroup(false)" class="w-full border-2 border-rose-100 dark:border-rose-900 text-rose-500 p-4 rounded-2xl font-black active-scale text-[15px] hover:bg-rose-50">Excluir APENAS esta</button>
-                <button type="button" onclick="closeGenericModal('delete-modal')" class="w-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 p-4 rounded-2xl font-black active-scale">Cancelar</button>
-            </div>
-        </div>
-    </div>
+    <!-- Modais Genéricos -->
+    <div id="pay-bill-modal" class="fixed inset-0 bg-slate-900/70 dark:bg-black/80 z-[90] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity opacity-0"><div class="bg-white dark:bg-slate-900 w-full max-w-sm p-8 rounded-[2.5rem] shadow-2xl text-center animate-slide-up"><h3 class="font-black text-2xl mb-4 tracking-tighter">Pagar Fatura</h3><p id="pay-bill-amount-display" class="text-3xl font-black text-emerald-500 mb-8 truncate px-4"></p><button onclick="confirmPayBill()" class="w-full bg-emerald-500 text-white p-4 rounded-2xl font-black mb-2 shadow-lg active-scale">Confirmar</button><button onclick="closeGenericModal('pay-bill-modal')" class="w-full p-4 text-slate-400 active-scale uppercase font-black text-[10px] tracking-widest">Cancelar</button></div></div>
+    <div id="delete-modal" class="fixed inset-0 bg-slate-900/70 dark:bg-black/80 z-[90] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity opacity-0"><div class="bg-white dark:bg-slate-900 w-full max-w-sm p-8 rounded-[2.5rem] shadow-2xl text-center animate-slide-up"><h3 class="font-black text-2xl mb-4 tracking-tighter">Excluir Registro</h3><p id="delete-message" class="mb-8 text-slate-400 text-sm px-4 leading-relaxed"></p><input type="hidden" id="delete-target-id"><input type="hidden" id="delete-target-group"><div id="delete-actions-normal"><button onclick="confirmDeleteNormal()" class="w-full bg-rose-500 text-white p-4 rounded-2xl font-black mb-2 shadow-lg active-scale">Excluir</button></div><div id="delete-actions-group" class="hidden flex flex-col gap-2"><button onclick="confirmDeleteGroup(true)" class="w-full bg-rose-500 text-white p-4 rounded-2xl font-black shadow-lg active-scale">Tudo</button><button onclick="confirmDeleteGroup(false)" class="w-full border-2 border-rose-500 text-rose-500 p-4 rounded-2xl font-black active-scale">Só esta</button></div><button onclick="closeGenericModal('delete-modal')" class="w-full p-4 text-slate-400 active-scale uppercase font-black text-[10px] tracking-widest mt-2">Cancelar</button></div></div>
 
     <script>
         // --- 1. ESTADO GLOBAL ---
-        let transactions = JSON.parse(localStorage.getItem('fin_v21_db')) || [];
-        let config = JSON.parse(localStorage.getItem('fin_v21_cfg')) || { closingDay: 4, webAuthnId: null };
-        let appTheme = localStorage.getItem('fin_v21_theme') || 'light';
-        let currentDate = new Date();
-        let activeTab = 'conta';
-        let isEditing = false;
-        let currentFormType = 'despesa';
-        let currentFormOrigin = 'conta';
-        let currentInstallments = 1;
-        let currentMonthBill = 0;
-        let currentMonthBillPaid = 0;
+        let transactions = JSON.parse(localStorage.getItem('fin_v25_db')) || [];
+        let config = JSON.parse(localStorage.getItem('fin_v25_cfg')) || { closingDay: 4, webAuthnId: null };
+        let appTheme = localStorage.getItem('fin_v25_theme') || 'light';
+        let tutorialDone = localStorage.getItem('fin_v25_tutorial') === 'done';
+        let currentDate = new Date(), activeTab = 'conta', onboardingStep = 0, isEditing = false, currentFormType = 'despesa', currentFormOrigin = 'conta', currentInstallments = 1, currentMonthBill = 0, currentMonthBillPaid = 0;
         const months = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
         function escapeHTML(str) { return str.replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t)); }
-        window.onload = () => { initTheme(); checkLock(); };
-
-        // --- 2. SEGURANÇA (WebAuthn) ---
         function bufferToBase64url(buf) { return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, ''); }
         function base64urlToBuffer(b64) { return Uint8Array.from(atob(b64.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0)); }
 
-        function checkLock() {
-            if (config.webAuthnId) {
-                document.getElementById('lock-screen').classList.remove('hidden');
-                document.body.classList.add('overflow-hidden');
-                updateAuthButtonUI();
-                setTimeout(verifyWebAuthn, 100);
-            } else { initApp(); }
-        }
+        window.onload = () => { initTheme(); if(!tutorialDone) startTutorial(); else checkLock(); };
 
-        function initApp() {
-            document.body.classList.remove('overflow-hidden');
-            initInstallmentsUI();
-            updateUI();
-            document.getElementById('closing-day-input').value = config.closingDay;
-            updateAuthButtonUI();
-        }
+        // --- 2. TUTORIAL VISUAL CONTEXTUAL ---
+        const tutorialSteps = [
+            { 
+                title: "Bem-vindo!", 
+                desc: "Gerencie sua vida financeira de forma privada e segura em um só lugar. 100% no seu dispositivo.", 
+                visual: `<div class="w-24 h-24 bg-blue-600 rounded-[2rem] flex items-center justify-center text-white shadow-2xl pulse-highlight"><svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2.5"/></svg></div>`
+            },
+            { 
+                title: "O Tempo Voa", 
+                desc: "Use as setas no topo para navegar entre os meses. Saldo e faturas se atualizam na hora.", 
+                visual: `<div class="flex items-center gap-6"><div class="p-3 bg-white/10 rounded-2xl border border-white/20"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="3"/></svg></div><div class="font-black text-xl tracking-widest uppercase">Meses</div><div class="p-3 bg-white/10 rounded-2xl border border-white/20"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="3"/></svg></div></div>`
+            },
+            { 
+                title: "Alternar Histórico", 
+                desc: "Clique nas setas centrais para alternar entre o extrato da sua Conta Corrente ou do Cartão de Crédito.", 
+                visual: `<div class="flex items-center gap-3 p-3 bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="3"/></svg><div class="text-[11px] font-black uppercase tracking-widest text-slate-100 px-2">Conta ⇋ Cartão</div><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="3"/></svg></div>`
+            },
+            { 
+                title: "Fatura & Fechamento", 
+                desc: "Nos Ajustes, defina o dia de fechamento. Compras feitas após esse dia caem automaticamente no mês seguinte.", 
+                visual: `<div class="bg-card-gradient p-4 rounded-2xl w-48 text-left shadow-xl"><div class="text-[8px] opacity-70 mb-1">FECHA DIA 04</div><div class="h-2 w-20 bg-white/20 rounded"></div></div>`
+            },
+            { 
+                title: "Menu de Ajustes", 
+                desc: "O botão (⚙️) à esquerda abre as configurações. Lá você ativa a Biometria, muda o tema e faz backups.", 
+                visual: `<div class="w-16 h-16 bg-white rounded-full shadow-2xl flex items-center justify-center text-slate-400 ring-4 ring-blue-600/10 pulse-highlight"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-width="2"/></svg></div>`
+            },
+            { 
+                title: "Novo Registro", 
+                desc: "O botão (+) à direita serve para lançar receitas, despesas e compras parceladas no cartão.", 
+                visual: `<div class="w-16 h-16 bg-blue-600 rounded-full shadow-2xl flex items-center justify-center text-white ring-4 ring-blue-600/20 pulse-highlight"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-width="4"/></svg></div>`
+            }
+        ];
 
-        async function verifyWebAuthn() {
-            if (!config.webAuthnId) return;
-            try {
-                await navigator.credentials.get({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), allowCredentials: [{ id: base64urlToBuffer(config.webAuthnId), type: "public-key" }], userVerification: "required" } });
-                const ls = document.getElementById('lock-screen');
-                ls.classList.add('opacity-0');
-                setTimeout(() => { ls.classList.add('hidden'); initApp(); }, 500);
-            } catch (e) { document.getElementById('lock-error-msg').classList.remove('hidden', 'opacity-0'); }
+        function startTutorial() { document.getElementById('tutorial-overlay').classList.remove('hidden'); renderStep(); }
+        function renderStep() {
+            const s = tutorialSteps[onboardingStep];
+            document.getElementById('tutorial-visual-area').innerHTML = s.visual;
+            document.getElementById('tutorial-title').innerText = s.title;
+            document.getElementById('tutorial-desc').innerText = s.desc;
+            document.getElementById('tutorial-next-btn').innerText = onboardingStep === tutorialSteps.length - 1 ? "Pronto, Vamos Lá!" : "Entendi, próximo";
+            document.getElementById('tutorial-dots-container').innerHTML = tutorialSteps.map((_, i) => `<div class="dot ${i === onboardingStep ? 'active' : ''}"></div>`).join('');
         }
+        function nextTutorialStep() { if(onboardingStep < tutorialSteps.length - 1) { onboardingStep++; renderStep(); } else skipTutorial(); }
+        function skipTutorial() { localStorage.setItem('fin_v25_tutorial', 'done'); document.getElementById('tutorial-overlay').classList.add('hidden'); checkLock(); }
 
+        // --- CORE, SEGURANÇA E NAVEGAÇÃO ---
+        function checkLock() { if (config.webAuthnId) { document.getElementById('lock-screen').classList.remove('hidden'); document.body.classList.add('overflow-hidden'); updateAuthButtonUI(); verifyWebAuthn(); } else initApp(); }
+        function initApp() { document.body.classList.remove('overflow-hidden'); initInstallmentsUI(); updateUI(); document.getElementById('closing-day-input').value = config.closingDay; updateAuthButtonUI(); }
+        async function verifyWebAuthn() { if (!config.webAuthnId) return; try { await navigator.credentials.get({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), allowCredentials: [{ id: base64urlToBuffer(config.webAuthnId), type: "public-key" }], userVerification: "required" } }); document.getElementById('lock-screen').classList.add('opacity-0'); setTimeout(() => { document.getElementById('lock-screen').classList.add('hidden'); initApp(); }, 500); } catch (e) { document.getElementById('lock-error-msg').classList.remove('hidden', 'opacity-0'); } }
         async function toggleWebAuthn() {
             if (config.webAuthnId) { config.webAuthnId = null; saveConfig(); updateAuthButtonUI(); showBackupMessage("Removido."); }
-            else {
-                if (!window.PublicKeyCredential) { showBackupMessage("Sem suporte biometria.", true); return; }
-                try {
-                    const c = await navigator.credentials.create({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), rp: { name: "Finanças Pro" }, user: { id: crypto.getRandomValues(new Uint8Array(16)), name: "user", displayName: "Titular" }, pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }], authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required" } } });
-                    config.webAuthnId = bufferToBase64url(c.rawId); saveConfig(); updateAuthButtonUI(); showBackupMessage("Proteção ativa!");
-                } catch (e) { showBackupMessage("Erro na biometria.", true); }
-            }
+            else { try { const c = await navigator.credentials.create({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), rp: { name: "Minhas Finanças" }, user: { id: crypto.getRandomValues(new Uint8Array(16)), name: "user", displayName: "Titular" }, pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }], authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required" } } }); config.webAuthnId = bufferToBase64url(c.rawId); saveConfig(); updateAuthButtonUI(); showBackupMessage("Protegido!"); } catch (e) { showBackupMessage("Erro biometria.", true); } }
         }
-
         function updateAuthButtonUI() {
             const b = document.getElementById('btn-toggle-auth'); if(!b) return;
-            if(config.webAuthnId) {
-                b.innerHTML = `<span class="flex items-center gap-2 text-emerald-500 font-black"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg> Proteção Ativa</span>`;
-                b.className = "w-full p-4 bg-emerald-50 dark:bg-emerald-950/20 rounded-2xl font-black text-xs uppercase tracking-widest active-scale flex items-center justify-center gap-2 border border-emerald-100 dark:border-emerald-900/30";
-            } else {
-                b.innerHTML = `<span>Ativar Biometria / PIN</span><svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>`;
-                b.className = "w-full p-4 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white rounded-2xl font-black text-xs uppercase tracking-widest active-scale flex items-center justify-between border border-transparent transition-all";
-            }
+            if(config.webAuthnId) { b.innerHTML = `<span class="text-emerald-500 font-black">Proteção Ativa</span>`; b.className = "w-full p-4 bg-emerald-50 dark:bg-emerald-950/20 rounded-2xl font-black text-xs uppercase flex items-center justify-center border border-emerald-100 dark:border-emerald-800"; }
+            else { b.innerHTML = `<span>Ativar Biometria / PIN</span><svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-width="2"/></svg>`; b.className = "w-full p-4 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white rounded-2xl font-black text-xs uppercase flex items-center justify-between border border-transparent transition-all"; }
         }
 
-        // --- 3. TEMA E BACKUP ---
-        function initTheme() {
-            if (appTheme === 'dark') document.documentElement.classList.add('dark');
-            else document.documentElement.classList.remove('dark');
-            const l = document.getElementById('btn-theme-light'), d = document.getElementById('btn-theme-dark');
-            const act = "flex-1 py-3 rounded-xl font-black text-xs transition-all bg-blue-600 text-white shadow-md border-transparent";
-            const inact = "flex-1 py-3 rounded-xl font-black text-xs transition-all text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800";
-            if(appTheme === 'dark') { d.className = act; l.className = inact; } else { l.className = act; d.className = inact; }
-        }
-        function setTheme(t) { appTheme = t; localStorage.setItem('fin_v21_theme', t); initTheme(); }
+        function initTheme() { if (appTheme === 'dark') document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark'); const l = document.getElementById('btn-theme-light'), d = document.getElementById('btn-theme-dark'); const ac = "flex-1 py-3 rounded-xl font-black text-xs bg-blue-600 text-white shadow-md border-transparent"; const ina = "flex-1 py-3 rounded-xl font-black text-xs text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800"; if(appTheme === 'dark') { d.className = ac; l.className = ina; } else { l.className = ac; d.className = ina; } }
+        function setTheme(t) { appTheme = t; localStorage.setItem('fin_v25_theme', t); initTheme(); }
+        function exportBackup() { const a = document.createElement('a'); a.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ transactions, config }))); a.setAttribute("download", "Backup_MinhasFinanças.json"); document.body.appendChild(a); a.click(); a.remove(); showBackupMessage("Backup baixado!"); }
+        function importBackup(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = evt => { try { const p = JSON.parse(evt.target.result); if(p.transactions && p.config) { transactions = p.transactions; config = p.config; updateUI(); showBackupMessage("Sucesso!"); } } catch(err){ showBackupMessage("Erro.", true); } }; r.readAsText(f); }
 
-        function showBackupMessage(t, e = false) { const m = document.getElementById('backup-msg'); m.innerText = t; m.className = `text-[10px] font-bold mt-3 ${e ? 'text-rose-500' : 'text-emerald-500'} block animate-fade-in`; setTimeout(() => m.classList.add('hidden'), 4000); }
-        function exportBackup() {
-            const data = { transactions, config };
-            const anchor = document.createElement('a');
-            anchor.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data)));
-            anchor.setAttribute("download", "Backup_FinançasPro.json");
-            document.body.appendChild(anchor); anchor.click(); anchor.remove();
-            showBackupMessage("Backup baixado!");
-        }
-        function importBackup(e) {
-            const f = e.target.files[0]; if (!f) return;
-            const r = new FileReader();
-            r.onload = function(evt) {
-                try {
-                    const p = JSON.parse(evt.target.result);
-                    if (p.transactions && p.config) { transactions = p.transactions; config = p.config; updateUI(); showBackupMessage("Sucesso!"); }
-                    else showBackupMessage("Inválido.", true);
-                } catch(err) { showBackupMessage("Erro.", true); }
-            };
-            r.readAsText(f);
-        }
-
-        // --- 4. LÓGICA CORE ---
-        function getBillCycle(dateStr, closingDay) {
-            const d = new Date(dateStr + "T12:00:00");
-            let m = d.getMonth(), y = d.getFullYear();
-            if (d.getDate() < closingDay) { m--; if (m < 0) { m = 11; y--; } }
-            return { month: m, year: y };
-        }
+        function getBillCycle(dtS, clD) { const d = new Date(dtS + "T12:00:00"); let m = d.getMonth(), y = d.getFullYear(); if(d.getDate() < clD) { m--; if(m < 0) { m = 11; y--; } } return { month: m, year: y }; }
         function changeMonth(s) { currentDate.setMonth(currentDate.getMonth() + s); updateUI(); }
-        function toggleContext() {
-            activeTab = activeTab === 'conta' ? 'cartao' : 'conta';
-            document.getElementById('context-display').innerText = activeTab === 'conta' ? 'Conta Corrente' : 'Fatura do Cartão';
-            renderTransactions();
-        }
+        function toggleContext() { activeTab = activeTab === 'conta' ? 'cartao' : 'conta'; document.getElementById('context-display').innerText = activeTab === 'conta' ? 'Conta Corrente' : 'Fatura do Cartão'; renderTransactions(); }
         function updateUI() {
             document.getElementById('current-month-display').innerText = `${months[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
             document.getElementById('closing-label').innerText = `Fecha dia ${String(config.closingDay).padStart(2, '0')}`;
             calculateTotals(); renderTransactions();
-            localStorage.setItem('fin_v21_db', JSON.stringify(transactions));
-            localStorage.setItem('fin_v21_cfg', JSON.stringify(config));
+            localStorage.setItem('fin_v25_db', JSON.stringify(transactions));
+            localStorage.setItem('fin_v25_cfg', JSON.stringify(config));
         }
         function calculateTotals() {
             let total = 0, inc = 0, exp = 0, bill = 0, paid = 0;
@@ -416,13 +351,9 @@
                 const val = parseFloat(t.amount) || 0, d = new Date(t.date + "T12:00:00"), tM = d.getMonth(), tY = d.getFullYear();
                 if (t.type === 'receita') { total += val; if (tM === vM && tY === vY) inc += val; }
                 else if (t.type === 'fatura') { total -= val; if (tM === vM && tY === vY) exp += val; if (t.billMonth === vM && t.billYear === vY) paid += val; }
-                else {
-                    if (t.origin === 'conta') { total -= val; if (tM === vM && tY === vY) exp += val; }
-                    else { const c = getBillCycle(t.date, config.closingDay); if (c.month === vM && c.year === vY) bill += val; }
-                }
+                else { if (t.origin === 'conta') { total -= val; if (tM === vM && tY === vY) exp += val; } else { const c = getBillCycle(t.date, config.closingDay); if (c.month === vM && c.year === vY) bill += val; } }
             });
-            currentMonthBill = bill; currentMonthBillPaid = paid;
-            const net = bill - paid;
+            currentMonthBill = bill; currentMonthBillPaid = paid; const net = bill - paid;
             document.getElementById('balance-total').innerText = formatCurrency(total);
             document.getElementById('month-income').innerText = formatCurrency(inc);
             document.getElementById('month-expense').innerText = formatCurrency(exp);
@@ -430,109 +361,47 @@
             if (bill > 0 && net <= 0) { card.className = "bg-gradient-to-br from-emerald-500 to-emerald-600 p-7 rounded-[2rem] shadow-xl text-white relative overflow-hidden transition-all duration-500"; lbl.innerText = "Fatura Paga ✅"; disp.innerText = formatCurrency(0); btn.classList.add('hidden'); }
             else { card.className = "bg-card-gradient p-7 rounded-[2rem] shadow-xl text-white relative overflow-hidden transition-all duration-500"; lbl.innerText = "Fatura do Cartão"; disp.innerText = formatCurrency(net); if (net > 0) btn.classList.remove('hidden'); else btn.classList.add('hidden'); }
         }
-
         function renderTransactions() {
-            const list = document.getElementById('transaction-list');
-            const vM = currentDate.getMonth(), vY = currentDate.getFullYear();
-            const fil = transactions.filter(t => {
-                const d = new Date(t.date + "T12:00:00");
-                if (activeTab === 'conta') return (d.getMonth() === vM && d.getFullYear() === vY) && (t.type === 'receita' || t.origin === 'conta' || t.type === 'fatura');
-                const c = getBillCycle(t.date, config.closingDay);
-                return t.origin === 'cartao' && c.month === vM && c.year === vY;
-            }).sort((a, b) => new Date(b.date) - new Date(a.date));
-            if (!fil.length) { list.innerHTML = `<div class="py-12 text-center opacity-30 animate-fade-in text-[10px] uppercase font-black tracking-widest text-slate-500 dark:text-slate-400">Sem registros</div>`; return; }
+            const list = document.getElementById('transaction-list'), vM = currentDate.getMonth(), vY = currentDate.getFullYear();
+            const fil = transactions.filter(t => { const d = new Date(t.date + "T12:00:00"); if (activeTab === 'conta') return (d.getMonth() === vM && d.getFullYear() === vY) && (t.type === 'receita' || t.origin === 'conta' || t.type === 'fatura'); const c = getBillCycle(t.date, config.closingDay); return t.origin === 'cartao' && c.month === vM && c.year === vY; }).sort((a, b) => new Date(b.date) - new Date(a.date));
+            if (!fil.length) { list.innerHTML = `<div class="py-12 text-center opacity-30 text-[10px] uppercase font-black tracking-widest text-slate-500 dark:text-slate-400">Sem histórico</div>`; return; }
             list.innerHTML = fil.map(t => {
                 const isF = t.type === 'fatura', isR = t.type === 'receita', isC = t.origin === 'cartao';
-                let cls = 'bg-rose-50 dark:bg-rose-950/30 text-rose-500', ic = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>';
-                if (isR) { cls = 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-500'; ic = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>'; }
-                else if (isF) { cls = 'bg-indigo-50 dark:bg-indigo-950/30 text-indigo-500'; ic = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'; }
-                else if (isC) { cls = 'bg-purple-50 dark:bg-purple-950/30 text-purple-500'; ic = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>'; }
+                let cls = 'bg-rose-50 dark:bg-rose-950/30 text-rose-500', ic = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" stroke-width="2.5"/></svg>';
+                if (isR) { cls = 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-500'; ic = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 10l7-7m0 0l7 7m-7-7v18" stroke-width="2.5"/></svg>'; }
+                else if (isF) { cls = 'bg-indigo-50 dark:bg-indigo-950/30 text-indigo-500'; ic = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2.5"/></svg>'; }
+                else if (isC) { cls = 'bg-purple-50 dark:bg-purple-950/30 text-purple-500'; ic = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-width="2"/></svg>'; }
                 const dt = t.date.split('-');
                 return `<div class="bg-white dark:bg-slate-900 p-4 rounded-[1.5rem] shadow-sm border border-slate-100 dark:border-slate-800 flex justify-between items-center animate-slide-up gap-3">
                     <div class="flex items-center gap-3 w-[60%] shrink-0 min-w-0"><div class="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${cls}">${ic}</div>
                     <div class="flex-1 min-w-0"><p class="font-black text-slate-800 dark:text-white text-[13px] leading-tight mb-1 truncate">${escapeHTML(t.description)}</p>
                     <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">${dt[2]}/${dt[1]} • ${isC ? 'Cartão' : 'Conta'}</p></div></div>
                     <div class="shrink-0 flex flex-col items-end w-[40%]"><p class="font-black text-[14px] whitespace-nowrap ${isR ? 'text-emerald-500' : 'text-slate-800 dark:text-white'}">${isR ? '+' : '-'} ${formatCurrency(parseFloat(t.amount))}</p>
-                    <div class="flex gap-3 mt-1.5">${!isF ? `<button onclick="openModal('${t.id}')" class="text-[9px] font-black text-blue-500 uppercase active-scale">Editar</button>` : ''}
-                    <button onclick="openDeleteModal('${t.id}')" class="text-[9px] font-black text-rose-500 uppercase active-scale">Excluir</button></div></div></div>`;
+                    <div class="flex gap-3 mt-1.5">${!isF ? `<button onclick="openModal('${t.id}')" class="text-[9px] font-black text-blue-500 uppercase">Editar</button>` : ''}
+                    <button onclick="openDeleteModal('${t.id}')" class="text-[9px] font-black text-rose-500 uppercase">Excluir</button></div></div></div>`;
             }).join('');
         }
 
-        // --- 5. INTERFACE ---
-        function initInstallmentsUI() { const c = document.getElementById('installments-container'); c.innerHTML = [1, 2, 3, 4, 5, 6, 10, 12].map(n => `<button type="button" data-val="${n}" onclick="setInstallments(${n})" class="inst-btn min-w-[3.5rem] py-3 rounded-2xl font-black text-sm transition-all focus:outline-none ${n === 1 ? 'bg-purple-600 text-white' : 'bg-white dark:bg-slate-900 text-purple-400 border border-purple-100 dark:border-slate-800 shadow-sm'}">${n === 1 ? '1x' : n + 'x'}</button>`).join(''); }
-        function setFormType(t) {
-            currentFormType = t;
-            const bD = document.getElementById('btn-type-despesa'), bR = document.getElementById('btn-type-receita');
-            const ac = "flex-1 py-3 rounded-xl font-black text-[9px] uppercase transition-all bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm border border-slate-200 dark:border-slate-600";
-            const inact = "flex-1 py-3 rounded-xl font-black text-[9px] uppercase transition-all text-slate-400 dark:text-slate-500";
-            if(t === 'despesa') { bD.className = ac; bR.className = inact; } else { bR.className = ac; bD.className = inact; }
-            updateFormVisibility();
-        }
-        function setFormOrigin(o) {
-            currentFormOrigin = o;
-            const bC = document.getElementById('btn-origin-conta'), bK = document.getElementById('btn-origin-cartao');
-            const ac = "flex-1 py-3 rounded-xl font-black text-[9px] uppercase transition-all bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm border border-slate-200 dark:border-slate-600";
-            const inact = "flex-1 py-3 rounded-xl font-black text-[9px] uppercase transition-all text-slate-400 dark:text-slate-500";
-            if(o === 'conta') { bC.className = ac; bK.className = inact; } else { bK.className = ac; bC.className = inact; }
-            updateFormVisibility();
-        }
+        // --- INTERFACE AUX ---
+        function initInstallmentsUI() { const c = document.getElementById('installments-container'); c.innerHTML = [1, 2, 3, 4, 5, 6, 10, 12].map(n => `<button type="button" data-val="${n}" onclick="setInstallments(${n})" class="inst-btn min-w-[3.5rem] py-3 rounded-2xl font-black text-sm transition-all focus:outline-none ${n === 1 ? 'bg-purple-600 text-white shadow-md' : 'bg-white dark:bg-slate-900 text-purple-400 border border-purple-100 dark:border-slate-800 shadow-sm'}">${n === 1 ? '1x' : n + 'x'}</button>`).join(''); }
+        function setFormType(t) { currentFormType = t; const bD = document.getElementById('btn-type-despesa'), bR = document.getElementById('btn-type-receita'), ac = "flex-1 py-3 rounded-xl font-black text-[9px] uppercase bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm border border-slate-200 dark:border-slate-600", ina = "flex-1 py-3 rounded-xl font-black text-[9px] uppercase text-slate-400 dark:text-slate-500"; if(t === 'despesa') { bD.className = ac; bR.className = ina; } else { bR.className = ac; bD.className = ina; } updateFormVisibility(); }
+        function setFormOrigin(o) { currentFormOrigin = o; const bC = document.getElementById('btn-origin-conta'), bK = document.getElementById('btn-origin-cartao'), ac = "flex-1 py-3 rounded-xl font-black text-[9px] uppercase bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm border border-slate-200 dark:border-slate-600", ina = "flex-1 py-3 rounded-xl font-black text-[9px] uppercase text-slate-400 dark:text-slate-500"; if(o === 'conta') { bC.className = ac; bK.className = ina; } else { bK.className = ac; bC.className = ina; } updateFormVisibility(); }
         function setInstallments(n) { currentInstallments = n; document.querySelectorAll('.inst-btn').forEach(b => { if(parseInt(b.dataset.val) === n) b.className = "inst-btn min-w-[3.5rem] py-3 rounded-2xl font-black text-sm transition-all bg-purple-600 text-white shadow-md focus:outline-none"; else b.className = "inst-btn min-w-[3.5rem] py-3 rounded-2xl font-black text-sm transition-all bg-white dark:bg-slate-900 text-purple-400 border border-purple-100 dark:border-slate-800 shadow-sm focus:outline-none"; }); }
-        function updateFormVisibility() {
-            const o = document.getElementById('origin-box'), i = document.getElementById('installments-box');
-            if (currentFormType === 'receita') { o.classList.add('hidden'); currentFormOrigin = 'conta'; i.classList.add('hidden'); }
-            else { o.classList.remove('hidden'); if (currentFormOrigin === 'cartao' && !isEditing) i.classList.remove('hidden'); else i.classList.add('hidden'); }
-        }
-
-        function openModal(id = null) {
-            isEditing = !!id; document.getElementById('finance-form').reset();
-            const dI = document.getElementById('date'); dI.value = new Date().toISOString().split('T')[0];
-            document.getElementById('modal-title').innerText = isEditing ? 'Editar' : 'Novo Lançamento';
-            if (isEditing) { const t = transactions.find(x => String(x.id) === String(id)); if(t) { document.getElementById('edit-id').value = id; document.getElementById('amount').value = t.amount; document.getElementById('description').value = t.description; dI.value = t.date; setFormType(t.type); setFormOrigin(t.origin); } }
-            else { document.getElementById('edit-id').value = ''; setFormType('despesa'); setFormOrigin('conta'); setInstallments(1); }
-            openGenericModal('modal', 'modal-content');
-        }
-
-        function handleFormSubmit(e) {
-            e.preventDefault(); const val = parseFloat(document.getElementById('amount').value); if(isNaN(val) || val <= 0) return;
-            const desc = document.getElementById('description').value.trim(), date = document.getElementById('date').value, editId = document.getElementById('edit-id').value;
-            if (isEditing) { const idx = transactions.findIndex(x => String(x.id) === String(editId)); if(idx !== -1) transactions[idx] = { ...transactions[idx], amount: val.toFixed(2), description: desc, type: currentFormType, origin: currentFormOrigin, date }; }
-            else {
-                const bId = Date.now();
-                if (currentInstallments > 1 && currentFormOrigin === 'cartao' && currentFormType === 'despesa') {
-                    for (let j = 0; j < currentInstallments; j++) {
-                        const dObj = new Date(date + "T12:00:00"); dObj.setMonth(dObj.getMonth() + j);
-                        transactions.push({ id: `${bId}-${j}`, groupId: bId.toString(), amount: (val / currentInstallments).toFixed(2), description: `${desc} (${j+1}/${currentInstallments})`, type: 'despesa', origin: 'cartao', date: dObj.toISOString().split('T')[0] });
-                    }
-                } else transactions.push({ id: bId.toString(), amount: val.toFixed(2), description: desc, type: currentFormType, origin: currentFormOrigin, date });
-            }
-            closeModal(); updateUI();
-        }
-
-        function toggleConfig(show) {
-            const overlay = document.getElementById('config-drawer-overlay');
-            const drawer = document.getElementById('config-drawer');
-            if (show) { overlay.classList.remove('hidden'); setTimeout(() => { overlay.style.opacity = '1'; drawer.classList.remove('-translate-x-full'); }, 10); }
-            else { drawer.classList.add('-translate-x-full'); overlay.style.opacity = '0'; setTimeout(() => overlay.classList.add('hidden'), 400); }
-        }
-
+        function updateFormVisibility() { const o = document.getElementById('origin-box'), i = document.getElementById('installments-box'); if (currentFormType === 'receita') { o.classList.add('hidden'); currentFormOrigin = 'conta'; i.classList.add('hidden'); } else { o.classList.remove('hidden'); if (currentFormOrigin === 'cartao' && !isEditing) i.classList.remove('hidden'); else i.classList.add('hidden'); } }
+        function openModal(id = null) { isEditing = !!id; document.getElementById('finance-form').reset(); const dI = document.getElementById('date'); dI.value = new Date().toISOString().split('T')[0]; document.getElementById('modal-title').innerText = isEditing ? 'Editar' : 'Novo Lançamento'; if (isEditing) { const t = transactions.find(x => String(x.id) === String(id)); if(t) { document.getElementById('edit-id').value = id; document.getElementById('amount').value = t.amount; document.getElementById('description').value = t.description; dI.value = t.date; setFormType(t.type); setFormOrigin(t.origin); } } else { document.getElementById('edit-id').value = ''; setFormType('despesa'); setFormOrigin('conta'); setInstallments(1); } openGenericModal('modal', 'modal-content'); }
+        function handleFormSubmit(e) { e.preventDefault(); const val = parseFloat(document.getElementById('amount').value); if(isNaN(val) || val <= 0) return; const desc = document.getElementById('description').value.trim(), date = document.getElementById('date').value, editId = document.getElementById('edit-id').value; if (isEditing) { const idx = transactions.findIndex(x => String(x.id) === String(editId)); if(idx !== -1) transactions[idx] = { ...transactions[idx], amount: val.toFixed(2), description: desc, type: currentFormType, origin: currentFormOrigin, date }; } else { const bId = Date.now(); if (currentInstallments > 1 && currentFormOrigin === 'cartao' && currentFormType === 'despesa') { for (let j = 0; j < currentInstallments; j++) { const dO = new Date(date + "T12:00:00"); dO.setMonth(dO.getMonth() + j); transactions.push({ id: `${bId}-${j}`, groupId: bId.toString(), amount: (val / currentInstallments).toFixed(2), description: `${desc} (${j+1}/${currentInstallments})`, type: 'despesa', origin: 'cartao', date: dO.toISOString().split('T')[0] }); } } else transactions.push({ id: bId.toString(), amount: val.toFixed(2), description: desc, type: currentFormType, origin: currentFormOrigin, date }); } closeModal(); updateUI(); }
+        function toggleConfig(show) { const overlay = document.getElementById('config-drawer-overlay'), drawer = document.getElementById('config-drawer'); if (show) { overlay.classList.remove('hidden'); setTimeout(() => { overlay.style.opacity = '1'; drawer.classList.remove('-translate-x-full'); }, 10); } else { drawer.classList.add('-translate-x-full'); overlay.style.opacity = '0'; setTimeout(() => overlay.classList.add('hidden'), 400); } }
         function openPayBillModal() { const a = currentMonthBill - currentMonthBillPaid; if (a <= 0) return; document.getElementById('pay-bill-amount-display').innerText = formatCurrency(a); openGenericModal('pay-bill-modal'); }
-        function confirmPayBill() { const a = currentMonthBill - currentMonthBillPaid; transactions.push({ id: Date.now().toString(), amount: a.toFixed(2), description: `Fatura ${months[currentDate.getMonth()]}`, type: 'fatura', origin: 'conta', date: new Date().toISOString().split('T')[0], billMonth: currentDate.getMonth(), billYear: currentDate.getFullYear() }); closeGenericModal('pay-bill-modal'); updateUI(); }
-        function openDeleteModal(id) {
-            const t = transactions.find(x => String(x.id) === String(id)); if (!t) return;
-            document.getElementById('delete-target-id').value = id; document.getElementById('delete-target-group').value = t.groupId || '';
-            const n = document.getElementById('delete-actions-normal'), g = document.getElementById('delete-actions-group'), m = document.getElementById('delete-message');
-            if (t.groupId) { m.innerText = "Este item é parcelado. O que deseja excluir?"; n.classList.add('hidden'); g.classList.remove('hidden'); }
-            else { m.innerText = "Deseja excluir permanentemente este registro?"; g.classList.add('hidden'); n.classList.remove('hidden'); }
-            openGenericModal('delete-modal');
-        }
+        function confirmPayBill() { const a = currentMonthBill - currentMonthBillPaid; transactions.push({ id: Date.now().toString(), amount: a.toFixed(2), description: `Pagamento Fatura ${months[currentDate.getMonth()]}`, type: 'fatura', origin: 'conta', date: new Date().toISOString().split('T')[0], billMonth: currentDate.getMonth(), billYear: currentDate.getFullYear() }); closeGenericModal('pay-bill-modal'); updateUI(); }
+        function openDeleteModal(id) { const t = transactions.find(x => String(x.id) === String(id)); if (!t) return; document.getElementById('delete-target-id').value = id; document.getElementById('delete-target-group').value = t.groupId || ''; const n = document.getElementById('delete-actions-normal'), g = document.getElementById('delete-actions-group'), m = document.getElementById('delete-message'); if (t.groupId) { m.innerText = "Item parcelado. Deseja excluir tudo ou só esta parcela?"; n.classList.add('hidden'); g.classList.remove('hidden'); } else { m.innerText = "Deseja excluir este registro permanentemente?"; g.classList.add('hidden'); n.classList.remove('hidden'); } openGenericModal('delete-modal'); }
         function confirmDeleteNormal() { transactions = transactions.filter(x => String(x.id) !== String(document.getElementById('delete-target-id').value)); closeGenericModal('delete-modal'); updateUI(); }
         function confirmDeleteGroup(all) { const id = document.getElementById('delete-target-id').value, g = document.getElementById('delete-target-group').value; if (all && g) transactions = transactions.filter(x => x.groupId !== g); else transactions = transactions.filter(x => String(x.id) !== String(id)); closeGenericModal('delete-modal'); updateUI(); }
-
         function openGenericModal(b, c = null) { const el = document.getElementById(b); el.classList.remove('hidden'); setTimeout(() => { el.style.opacity = '1'; if(c) document.getElementById(c).classList.remove('translate-y-full'); }, 10); }
         function closeGenericModal(b, c = null) { const el = document.getElementById(b); if(c) document.getElementById(c).classList.add('translate-y-full'); el.style.opacity = '0'; setTimeout(() => el.classList.add('hidden'), 300); }
         function closeModal() { closeGenericModal('modal', 'modal-content'); }
         function saveConfig() { const v = parseInt(document.getElementById('closing-day-input').value); if (v >= 1 && v <= 31) { config.closingDay = v; toggleConfig(false); updateUI(); } }
         function formatCurrency(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+        function showBackupMessage(t, e = false) { const m = document.getElementById('backup-msg'); m.innerText = t; m.className = `text-[10px] font-bold mt-3 ${e ? 'text-rose-500' : 'text-emerald-500'} block animate-fade-in`; setTimeout(() => m.classList.add('hidden'), 4000); }
     </script>
 </body>
 </html>
