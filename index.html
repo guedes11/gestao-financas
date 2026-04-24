@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <!-- Versão da Aplicação para controle de Update -->
-    <meta name="app-version" content="1.2.0">
+    <meta name="app-version" content="1.2.1">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline';">
     <title>Minhas Finanças</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -129,9 +129,15 @@
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-width="2.5"/></svg>
                 </div>
             </div>
-            <button type="button" id="btn-pay-bill" onclick="openPayBillModal()" class="hidden relative z-10 mt-6 bg-white text-purple-600 text-[11px] font-black py-4 px-4 rounded-2xl active-scale w-full uppercase tracking-widest shadow-lg focus:outline-none">
-                Pagar Fatura Agora
-            </button>
+            <!-- Botões de Ação da Fatura -->
+            <div class="flex flex-col gap-2 mt-6 relative z-10">
+                <button type="button" id="btn-pay-bill" onclick="openPayBillModal()" class="hidden bg-white text-purple-600 text-[11px] font-black py-4 px-4 rounded-2xl active-scale w-full uppercase tracking-widest shadow-lg focus:outline-none">
+                    Pagar Fatura Agora
+                </button>
+                <button type="button" id="btn-reopen-bill" onclick="reopenBill()" class="hidden bg-black/20 text-white text-[10px] font-black py-3 px-4 rounded-xl active-scale w-full uppercase tracking-widest border border-white/20 focus:outline-none backdrop-blur-sm">
+                    Reabrir Fatura
+                </button>
+            </div>
         </div>
 
         <div class="flex items-center justify-between bg-slate-200/50 dark:bg-slate-900 rounded-2xl p-1 mb-6 mt-8 border border-slate-200/50 dark:border-slate-800 transition-colors">
@@ -282,7 +288,6 @@
         window.onload = () => { 
             initTheme(); 
             if(!tutorialDone) startTutorial(); else checkLock();
-            // Inicia verificação silenciosa de update
             checkForUpdates();
         };
 
@@ -299,7 +304,7 @@
                 if (remoteVersion && remoteVersion !== localVersion) {
                     document.getElementById('update-toast').classList.remove('hidden');
                 }
-            } catch (e) { /* Falha silenciosa se offline */ }
+            } catch (e) { }
         }
 
         // --- 2. TUTORIAL VISUAL ---
@@ -389,11 +394,11 @@
                 } catch(err){ showBackupMessage("Inválido.", true); }
             };
             r.readAsText(f);
-            e.target.value = ""; // Reseta para permitir nova seleção
+            e.target.value = ""; 
         }
 
-        // --- OUTRAS FUNÇÕES (MANTIDAS DA v21/v22) ---
-        async function verifyWebAuthn() { if (!config.webAuthnId) return; try { await navigator.credentials.get({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), allowCredentials: [{ id: base64urlToBuffer(config.webAuthnId), type: "public-key" }], userVerification: "required" } }); document.getElementById('lock-screen').classList.add('opacity-0'); setTimeout(() => { document.getElementById('lock-screen').classList.add('hidden'); initApp(); }, 500); } catch (e) { document.getElementById('lock-error-msg').classList.remove('hidden', 'opacity-0'); } }
+        // --- OUTRAS FUNÇÕES ---
+        async function verifyWebAuthn() { if (!config.webAuthnId) return; try { await navigator.credentials.get({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), allowCredentials: [{ id: base64urlToBuffer(config.webAuthnId), type: "public-key" }], userVerification: "required" } }); document.getElementById('lock-screen').classList.add('opacity-0'); setTimeout(() => { document.getElementById('lock-screen').classList.add('hidden'); initApp(); }, 500); } catch (e) { } }
         async function toggleWebAuthn() { if (config.webAuthnId) { config.webAuthnId = null; saveConfig(); updateAuthButtonUI(); showBackupMessage("Removido."); } else { try { const c = await navigator.credentials.create({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), rp: { name: "Minhas Finanças" }, user: { id: crypto.getRandomValues(new Uint8Array(16)), name: "user", displayName: "Titular" }, pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }], authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required" } } }); config.webAuthnId = bufferToBase64url(c.rawId); saveConfig(); updateAuthButtonUI(); showBackupMessage("Ativado!"); } catch (e) { showBackupMessage("Erro.", true); } } }
         function updateAuthButtonUI() { const b = document.getElementById('btn-toggle-auth'); if(!b) return; if(config.webAuthnId) { b.innerHTML = `<span class="text-emerald-500 font-black tracking-widest flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-width="2"/></svg> BIOMETRIA ATIVA</span>`; b.className = "w-full p-4 bg-emerald-50 dark:bg-emerald-950/20 rounded-2xl font-black text-xs flex items-center justify-center border border-emerald-100 dark:border-emerald-800 transition-all"; } else { b.innerHTML = `<span>ATIVAR BIOMETRIA / PIN</span><svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-width="2"/></svg>`; b.className = "w-full p-4 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white rounded-2xl font-black text-xs flex items-center justify-between border border-transparent transition-all"; } }
         function initTheme() { if (appTheme === 'dark') document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark'); const l = document.getElementById('btn-theme-light'), d = document.getElementById('btn-theme-dark'); const ac = "flex-1 py-3 rounded-xl font-black text-xs bg-blue-600 text-white shadow-md border-transparent transition-all"; const ina = "flex-1 py-3 rounded-xl font-black text-xs text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 transition-all"; if(appTheme === 'dark') { d.className = ac; l.className = ina; } else { l.className = ac; d.className = ina; } }
@@ -401,6 +406,7 @@
         function changeMonth(s) { currentDate.setMonth(currentDate.getMonth() + s); updateUI(); }
         function toggleContext() { activeTab = activeTab === 'conta' ? 'cartao' : 'conta'; document.getElementById('context-display').innerText = activeTab === 'conta' ? 'Conta Corrente' : 'Fatura do Cartão'; renderTransactions(); }
         function updateUI() { document.getElementById('current-month-display').innerText = `${months[currentDate.getMonth()]} ${currentDate.getFullYear()}`; document.getElementById('closing-label').innerText = `Fecha dia ${String(config.closingDay).padStart(2, '0')}`; calculateTotals(); renderTransactions(); localStorage.setItem('min_fin_v3_db', JSON.stringify(transactions)); localStorage.setItem('min_fin_v3_cfg', JSON.stringify(config)); }
+        
         function calculateTotals() {
             let total = 0, inc = 0, exp = 0, bill = 0, paid = 0;
             const vM = currentDate.getMonth(), vY = currentDate.getFullYear();
@@ -414,10 +420,37 @@
             document.getElementById('balance-total').innerText = formatCurrency(total);
             document.getElementById('month-income').innerText = formatCurrency(inc);
             document.getElementById('month-expense').innerText = formatCurrency(exp);
-            const card = document.getElementById('card-fatura'), lbl = document.getElementById('label-fatura'), btn = document.getElementById('btn-pay-bill'), disp = document.getElementById('bill-total');
-            if (bill > 0 && net <= 0) { card.className = "bg-gradient-to-br from-emerald-500 to-emerald-600 p-7 rounded-[2rem] shadow-xl text-white relative overflow-hidden transition-all duration-500"; lbl.innerText = "Fatura Paga ✅"; disp.innerText = formatCurrency(0); btn.classList.add('hidden'); }
-            else { card.className = "bg-card-gradient p-7 rounded-[2rem] shadow-xl text-white relative overflow-hidden transition-all duration-500"; lbl.innerText = "Fatura do Cartão"; disp.innerText = formatCurrency(net); if (net > 0) btn.classList.remove('hidden'); else btn.classList.add('hidden'); }
+            
+            const card = document.getElementById('card-fatura'), lbl = document.getElementById('label-fatura'), btnPay = document.getElementById('btn-pay-bill'), btnReopen = document.getElementById('btn-reopen-bill'), disp = document.getElementById('bill-total');
+            
+            if (bill > 0 && net <= 0) { 
+                card.className = "bg-gradient-to-br from-emerald-500 to-emerald-600 p-7 rounded-[2rem] shadow-xl text-white relative overflow-hidden transition-all duration-500"; 
+                lbl.innerText = "Fatura Paga ✅"; 
+                disp.innerText = formatCurrency(0); 
+                btnPay.classList.add('hidden');
+                btnReopen.classList.remove('hidden'); // Mostra botão de reabrir
+            } else { 
+                card.className = "bg-card-gradient p-7 rounded-[2rem] shadow-xl text-white relative overflow-hidden transition-all duration-500"; 
+                lbl.innerText = "Fatura do Cartão"; 
+                disp.innerText = formatCurrency(net); 
+                btnReopen.classList.add('hidden');
+                if (net > 0) btnPay.classList.remove('hidden'); else btnPay.classList.add('hidden'); 
+            }
         }
+
+        // Função para reabrir a fatura excluindo o pagamento realizado para o ciclo atual
+        function reopenBill() {
+            const vM = currentDate.getMonth(), vY = currentDate.getFullYear();
+            // Filtra as transações removendo a transação de quitação (type: fatura) vinculada a este mês/ano
+            const initialCount = transactions.length;
+            transactions = transactions.filter(t => !(t.type === 'fatura' && t.billMonth === vM && t.billYear === vY));
+            
+            if (transactions.length < initialCount) {
+                updateUI();
+                showBackupMessage("Fatura Reaberta!");
+            }
+        }
+
         function renderTransactions() {
             const list = document.getElementById('transaction-list'), vM = currentDate.getMonth(), vY = currentDate.getFullYear();
             const fil = transactions.filter(t => { const d = new Date(t.date + "T12:00:00"); if (activeTab === 'conta') return (d.getMonth() === vM && d.getFullYear() === vY) && (t.type === 'receita' || t.origin === 'conta' || t.type === 'fatura'); const c = getBillCycle(t.date, config.closingDay); return t.origin === 'cartao' && c.month === vM && c.year === vY; }).sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -440,6 +473,7 @@
                     </div></div></div>`;
             }).join('');
         }
+
         function initInstallmentsUI() { const c = document.getElementById('installments-container'); const opt = []; for(let i=1;i<=12;i++) opt.push(i); opt.push(15,18,24); c.innerHTML = opt.map(n => `<button type="button" data-val="${n}" onclick="setInstallments(${n})" class="inst-btn min-w-[3.5rem] py-3 rounded-2xl font-black text-sm transition-all focus:outline-none ${n === 1 ? 'bg-purple-600 text-white shadow-md' : 'bg-white dark:bg-slate-900 text-purple-400 border border-purple-100 dark:border-slate-800 shadow-sm'}">${n === 1 ? 'À vista' : n + 'x'}</button>`).join(''); }
         function setFormType(t) { currentFormType = t; const bD = document.getElementById('btn-type-despesa'), bR = document.getElementById('btn-type-receita'), ac = "flex-1 py-3 rounded-xl font-black text-[9px] uppercase bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm border border-slate-200 dark:border-slate-600", ina = "flex-1 py-3 rounded-xl font-black text-[9px] uppercase text-slate-400 dark:text-slate-500"; if(t === 'despesa') { bD.className = ac; bR.className = ina; } else { bR.className = ac; bD.className = ina; } updateFormVisibility(); }
         function setFormOrigin(o) { currentFormOrigin = o; const bC = document.getElementById('btn-origin-conta'), bK = document.getElementById('btn-origin-cartao'), ac = "flex-1 py-3 rounded-xl font-black text-[9px] uppercase bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm border border-slate-200 dark:border-slate-600", ina = "flex-1 py-3 rounded-xl font-black text-[9px] uppercase text-slate-400 dark:text-slate-500"; if(o === 'conta') { bC.className = ac; bK.className = ina; } else { bK.className = ac; bC.className = ina; } updateFormVisibility(); }
